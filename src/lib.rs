@@ -5,10 +5,7 @@ extern crate hamcrest;
 extern crate log;
 
 pub mod threads;
-
-pub const DEFAULT_ADDRESS: &str = "127.0.0.1";
-pub const DEFAULT_PORT: &str = "8080";
-pub const DEFAULT_NUMBER_OF_THREADS: &str = "4";
+pub mod server;
 
 pub struct Config<'a> {
     pub address: &'a str,
