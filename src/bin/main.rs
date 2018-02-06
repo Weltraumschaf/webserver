@@ -1,12 +1,19 @@
+extern crate hello;
+#[macro_use]
+extern crate log;
+extern crate simple_logger;
+
 use std::io::prelude::*;
 use std::net::TcpListener;
 use std::net::TcpStream;
 use std::fs::File;
-
-extern crate hello;
 use hello::ThreadPool;
 
+
 fn main() {
+    simple_logger::init().unwrap();
+    info!("Starting web server ...");
+
     let listener = TcpListener::bind("127.0.0.1:8080").unwrap();
     let pool = ThreadPool::new(4);
 

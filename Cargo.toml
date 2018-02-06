@@ -6,7 +6,7 @@ authors = ["Sven Strittmatter <ich@weltraumschaf.de>"]
 [dependencies]
 clap = "2.29.2"
 log = "0.4.1"
-env_logger = "0.5.3"
+simple_logger = "0.3.1"
 
 [dev-dependencies]
 hamcrest = "0.1.5"
