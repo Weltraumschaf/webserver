@@ -24,17 +24,23 @@ fn main() {
             .short("a")
             .long("address")
             .takes_value(true)
-            .help(format!("The IP address to bind to. Default is {}.", hello::DEFAULT_ADDRESS).as_str()))
+            .help(format!(
+                "The IP address to bind to. Default is {}.",
+                hello::DEFAULT_ADDRESS).as_str()))
         .arg(Arg::with_name("port")
             .short("p")
             .long("port")
             .takes_value(true)
-            .help(format!("The port to bind to. Default is {}.", hello::DEFAULT_PORT).as_str()))
+            .help(format!(
+                "The port to bind to. Default is {}.",
+                hello::DEFAULT_PORT).as_str()))
         .arg(Arg::with_name("threads")
             .short("t")
             .long("threads")
             .takes_value(true)
-            .help(format!("Number of parallel threads used to serve. Default is {}", hello::DEFAULT_NUMBER_OF_THREADS).as_str()))
+            .help(format!(
+                "Number of parallel threads used to serve. Default is {}",
+                hello::DEFAULT_NUMBER_OF_THREADS).as_str()))
         .arg(Arg::with_name("dir")
             .short("d")
             .long("dir")
@@ -68,7 +74,6 @@ fn main() {
     let config = Config::new(address, port, number_of_threads, dir);
 
     bind_listener(config);
-
 }
 
 fn bind_listener(config: Config) {
