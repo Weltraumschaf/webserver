@@ -32,13 +32,12 @@ impl Server {
             let stream = stream.unwrap();
 
             pool.execute(|| {
-                // FIXME
-//                self.handle_connection(stream);
+                Server::handle_connection(stream);
             });
         }
     }
 
-    fn handle_connection(self, mut stream: TcpStream) {
+    fn handle_connection(mut stream: TcpStream) {
         let mut buffer = [0; 512];
         stream.read(&mut buffer).unwrap();
 
