@@ -68,7 +68,11 @@ fn main() {
 
     let dir = matches.value_of("dir").unwrap();
 
-    let config = Config::new(address, port, number_of_threads, dir);
+    let config = Config::new(
+        address.to_string(),
+        port,
+        number_of_threads,
+        dir.to_string());
 
     let server = Server::new(config);
     server.bind();

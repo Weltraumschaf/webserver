@@ -11,11 +11,11 @@ pub mod defaults {
     pub const DEFAULT_NUMBER_OF_THREADS: &str = "4";
 }
 
-pub struct Server<'a> {
-    config: Config<'a>,
+pub struct Server {
+    config: Config,
 }
 
-impl<'a> Server<'a> {
+impl Server {
     pub fn new(config: Config) -> Server {
         Server { config }
     }
