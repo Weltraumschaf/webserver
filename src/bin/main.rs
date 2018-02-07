@@ -6,7 +6,7 @@ extern crate clap;
 
 use clap::{Arg, App};
 use hello::Config;
-use hello::server;
+use hello::server::defaults::*;
 use hello::server::Server;
 
 fn main() {
@@ -23,21 +23,21 @@ fn main() {
             .takes_value(true)
             .help(format!(
                 "The IP address to bind to. Default is {}.",
-                server::DEFAULT_ADDRESS).as_str()))
+                DEFAULT_ADDRESS).as_str()))
         .arg(Arg::with_name("port")
             .short("p")
             .long("port")
             .takes_value(true)
             .help(format!(
                 "The port to bind to. Default is {}.",
-                server::DEFAULT_PORT).as_str()))
+                DEFAULT_PORT).as_str()))
         .arg(Arg::with_name("threads")
             .short("t")
             .long("threads")
             .takes_value(true)
             .help(format!(
                 "Number of parallel threads used to serve. Default is {}",
-                server::DEFAULT_NUMBER_OF_THREADS).as_str()))
+                DEFAULT_NUMBER_OF_THREADS).as_str()))
         .arg(Arg::with_name("dir")
             .short("d")
             .long("dir")
@@ -47,9 +47,9 @@ fn main() {
         .get_matches();
 
     let address = matches.value_of("address")
-        .unwrap_or(server::DEFAULT_ADDRESS);
+        .unwrap_or(DEFAULT_ADDRESS);
     let port = matches.value_of("port")
-        .unwrap_or(server::DEFAULT_PORT)
+        .unwrap_or(DEFAULT_PORT)
         .parse::<u16>()
         .unwrap();
 
@@ -58,7 +58,7 @@ fn main() {
     }
 
     let number_of_threads = matches.value_of("threads")
-        .unwrap_or(server::DEFAULT_NUMBER_OF_THREADS)
+        .unwrap_or(DEFAULT_NUMBER_OF_THREADS)
         .parse::<usize>()
         .unwrap();
 
