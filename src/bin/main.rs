@@ -1,13 +1,13 @@
-extern crate hello;
+extern crate webserver;
 #[macro_use]
 extern crate log;
 extern crate simple_logger;
 extern crate clap;
 
 use clap::{Arg, App};
-use hello::Config;
-use hello::server::defaults::*;
-use hello::server::Server;
+use webserver::Config;
+use webserver::server::defaults::*;
+use webserver::server::Server;
 
 fn main() {
     simple_logger::init().unwrap();

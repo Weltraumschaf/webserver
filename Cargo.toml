@@ -1,5 +1,5 @@
 [package]
-name = "hello"
+name = "webserver"
 version = "1.0.0"
 authors = ["Sven Strittmatter <ich@weltraumschaf.de>"]
 
