@@ -17,6 +17,16 @@ The goal of this project is to extend the basic implementation from the book wit
     - number of threads used in the pool (done)
     - directory where to find files to server (wip)
 - file based configuration
+    - YAML based
+    - values for 
+        - IP
+        - port
+        - threads
+        - web root
+        - error doc root
+        - log file path
+        - host name
+- logging to file
 - HTTP methods
     - GET requests
     - HEAD requests
