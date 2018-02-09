@@ -20,7 +20,7 @@ impl Server {
         Server { config }
     }
 
-    pub fn bind(self) {
+    pub fn bind(&self) {
         let addr = format!("{}:{}", self.config.address, self.config.port);
         info!("Bind to {}", addr);
         let listener = TcpListener::bind(addr).unwrap();
@@ -30,25 +30,25 @@ impl Server {
 
         for stream in listener.incoming() {
             let stream = stream.unwrap();
-
-            pool.execute(|| {
-                Server::handle_connection(stream);
+            pool.execute( || {
+                Server::handle_connection(stream, "web_root");
             });
         }
     }
 
-    fn handle_connection(mut stream: TcpStream) {
+    fn handle_connection(mut stream: TcpStream, dir: &str) {
         let mut buffer = [0; 512];
         stream.read(&mut buffer).unwrap();
 
         let get = b"GET / HTTP/1.1\r\n";
 
-        let (status_line, filename) = if buffer.starts_with(get) {
+        let (status_line, resource) = if buffer.starts_with(get) {
             ("HTTP/1.1 200 OK\r\n\r\n", "hello.html")
         } else {
             ("HTTP/1.1 404 NOT FOUND\r\n\r\n", "404.html")
         };
 
+        let filename = format!("{}/{}", dir, resource);
         let mut file = File::open(filename).unwrap();
         let mut contents = String::new();
 
