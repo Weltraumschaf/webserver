@@ -15,7 +15,7 @@ The goal of this project is to extend the basic implementation from the book wit
     - IP to bind (done)
     - port to bind (done)
     - number of threads used in the pool (done)
-    - directory where to find files to server (wip)
+    - directory where to find files to server (done)
 - file based configuration
     - YAML based
     - values for 
@@ -27,7 +27,7 @@ The goal of this project is to extend the basic implementation from the book wit
         - log file path
         - host name
 - logging to file
-- HTTP methods
+- HTTP methods (wip)
     - GET requests
     - HEAD requests
     - OPTIONS request

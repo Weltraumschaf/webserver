@@ -3,6 +3,7 @@ use std::net::TcpListener;
 use std::net::TcpStream;
 use std::fs::File;
 use Config;
+use http::RequestParser;
 use threads::ThreadPool;
 
 pub mod defaults {
@@ -23,18 +24,34 @@ impl Server {
     pub fn bind(&self) {
         let addr = format!("{}:{}", self.config.address, self.config.port);
         info!("Bind to {}", addr);
-        let listener = TcpListener::bind(addr).unwrap();
+        let listener = TcpListener::bind(addr.clone())
+            .expect(format!("Can't bind TCP listener on address {}!", addr).as_str());
 
         info!("Serving with {} threads.", self.config.threads);
         let pool = ThreadPool::new(self.config.threads);
 
         for stream in listener.incoming() {
-            let stream = stream.unwrap();
+            let stream = stream.expect("Cn't open TCP stream!");
             let config = self.config.clone();
+
             pool.execute( || {
-                Server::handle_connection(stream, config);
+//                Server::handle_connection(stream, config);
+                Server::handle_connection_new(stream, config);
             });
         }
+    }
+
+    fn handle_connection_new(mut stream: TcpStream, config: Config) {
+        let mut buffer = String::new();
+        let number_of_bytes = stream.read_to_string(&mut buffer)
+            .expect("Can't read from TCP stream!");
+        debug!("Received {} bytes as request.", number_of_bytes);
+
+        let parser = RequestParser::new();
+        let request = parser.parse(&buffer);
+
+        stream.write(buffer.as_bytes()).unwrap();
+        stream.flush().unwrap();
     }
 
     fn handle_connection(mut stream: TcpStream, config: Config) {
