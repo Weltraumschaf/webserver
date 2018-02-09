@@ -27,11 +27,12 @@ impl Server {
 
         info!("Serving with {} threads.", self.config.threads);
         let pool = ThreadPool::new(self.config.threads);
+        let web_root = self.config.dir().clone().as_str();
 
         for stream in listener.incoming() {
             let stream = stream.unwrap();
-            pool.execute( || {
-                Server::handle_connection(stream, "web_root");
+            pool.execute( move|| {
+                Server::handle_connection(stream, web_root.clone());
             });
         }
     }
