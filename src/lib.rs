@@ -7,6 +7,7 @@ extern crate log;
 pub mod threads;
 pub mod server;
 
+#[derive(Debug, Clone)]
 pub struct Config {
     address: String,
     port: u16,

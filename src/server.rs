@@ -27,17 +27,17 @@ impl Server {
 
         info!("Serving with {} threads.", self.config.threads);
         let pool = ThreadPool::new(self.config.threads);
-        let web_root = self.config.dir().clone().as_str();
 
         for stream in listener.incoming() {
             let stream = stream.unwrap();
+            let config = self.config.clone();
             pool.execute( move|| {
-                Server::handle_connection(stream, web_root.clone());
+                Server::handle_connection(stream, config);
             });
         }
     }
 
-    fn handle_connection(mut stream: TcpStream, dir: &str) {
+    fn handle_connection(mut stream: TcpStream, config: Config) {
         let mut buffer = [0; 512];
         stream.read(&mut buffer).unwrap();
 
@@ -49,7 +49,7 @@ impl Server {
             ("HTTP/1.1 404 NOT FOUND\r\n\r\n", "404.html")
         };
 
-        let filename = format!("{}/{}", dir, resource);
+        let filename = format!("{}/{}", config.dir(), resource);
         let mut file = File::open(filename).unwrap();
         let mut contents = String::new();
 
