@@ -31,7 +31,7 @@ impl Server {
         for stream in listener.incoming() {
             let stream = stream.unwrap();
             let config = self.config.clone();
-            pool.execute( move|| {
+            pool.execute( || {
                 Server::handle_connection(stream, config);
             });
         }
