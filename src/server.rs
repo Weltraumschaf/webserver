@@ -48,10 +48,12 @@ impl Server {
         debug!("Received {} bytes as request.", number_of_bytes);
 
         let parser = RequestParser::new();
-        let request = parser.parse(&buffer);
+        let request = parser.parse(buffer);
 
-        stream.write(buffer.as_bytes()).unwrap();
-        stream.flush().unwrap();
+        stream.write("Hello, World!".as_bytes())
+            .expect("Can't write to TCP stream!");
+        stream.flush()
+            .expect("Can't flush TCP stream!");
     }
 
     fn handle_connection(mut stream: TcpStream, config: Config) {

@@ -1,5 +1,3 @@
-const EOL: &str = "\r\n";
-
 #[derive(Debug, Clone, PartialEq)]
 pub struct Request {
     method: String,
@@ -10,6 +8,7 @@ pub struct Request {
     accept: String,
 }
 
+#[derive(Debug)]
 struct RequestBuilder {
     method: String,
     url: String,
@@ -42,34 +41,28 @@ impl RequestBuilder {
         }
     }
 
-    fn with_method(mut self, new_method: &String) -> RequestBuilder {
+    fn with_method(&mut self, new_method: &String) {
         self.method = new_method.clone();
-        self
     }
 
-    fn with_url(mut self, new_url: &String) -> RequestBuilder {
+    fn with_url(&mut self, new_url: &String) {
         self.url = new_url.clone();
-        self
     }
 
-    fn with_version(mut self, new_version: &String) -> RequestBuilder {
+    fn with_version(&mut self, new_version: &String) {
         self.version = new_version.clone();
-        self
     }
 
-    fn with_host(mut self, new_host: &String) -> RequestBuilder {
+    fn with_host(&mut self, new_host: &String) {
         self.host = new_host.clone();
-        self
     }
 
-    fn with_user_agent(mut self, new_user_agent: &String) -> RequestBuilder {
+    fn with_user_agent(&mut self, new_user_agent: &String) {
         self.user_agent = new_user_agent.clone();
-        self
     }
 
-    fn with_accept(mut self, new_accept: &String) -> RequestBuilder {
+    fn with_accept(&mut self, new_accept: &String) {
         self.accept = new_accept.clone();
-        self
     }
 }
 
@@ -80,8 +73,35 @@ impl RequestParser {
         RequestParser {}
     }
 
-    pub fn parse(&self, input: &String) -> Request {
-        let builder = RequestBuilder::new();
+    pub fn parse(&self, input: String) -> Request {
+        let mut builder = RequestBuilder::new();
+        let mut lexer = RequestLexer::new(input);
+
+        while lexer.has_next() {
+            match lexer.next() {
+                RequestToken::Method(method) => {
+                    builder.with_method(&method);
+                },
+                RequestToken::Url(url) => {
+                    builder.with_url(&url);
+                },
+                RequestToken::Version(version) => {
+                    builder.with_version(&version);
+                },
+                RequestToken::HeaderName(name) => {},
+                RequestToken::HeaderValue(value) => {},
+                RequestToken::EOL => {
+                    continue; // ignore EOL
+                },
+                RequestToken::EOT => {
+                    break; // end of token stream
+                },
+                _ => {
+                    panic!("Unrecognized token!");
+                },
+            }
+        }
+
         builder.finish()
     }
 }
@@ -97,6 +117,7 @@ enum RequestToken {
     EOT,
 }
 
+#[derive(Debug)]
 struct RequestLexer {
     input: String,
     index: usize,
@@ -171,7 +192,7 @@ impl RequestLexer {
                             return RequestToken::HeaderValue(buffer);
                         }
 
-                        if ch == ':'  {
+                        if ch == ':' {
                             self.next_char(); // consume colon
                             return RequestToken::HeaderName(buffer);
                         }
