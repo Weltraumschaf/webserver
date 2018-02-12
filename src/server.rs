@@ -4,6 +4,7 @@ use std::net::TcpStream;
 use std::fs::File;
 use Config;
 use threads::ThreadPool;
+use http;
 
 pub mod defaults {
     pub const DEFAULT_ADDRESS: &str = "127.0.0.1";
@@ -41,13 +42,13 @@ impl Server {
     }
 
     fn handle_connection_new(mut stream: TcpStream, config: Config) {
-        let mut buffer = String::new();
-        let number_of_bytes = stream.read_to_string(&mut buffer)
+        let mut request_buffer = String::new();
+        let number_of_bytes = stream.read_to_string(&mut request_buffer)
             .expect("Can't read from TCP stream!");
         debug!("Received {} bytes as request.", number_of_bytes);
 
-//        let parser = RequestParser::new();
-//        let request = parser.parse(buffer);
+        let request = http::parse_request(request_buffer.as_str());
+        debug!("Got request: {:?}", request);
 //
 //        stream.write("Hello, World!".as_bytes())
 //            .expect("Can't write to TCP stream!");
