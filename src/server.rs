@@ -5,6 +5,8 @@ use std::fs::File;
 use Config;
 use threads::ThreadPool;
 use http;
+use http::Response;
+use http::Status;
 
 pub mod defaults {
     pub const DEFAULT_ADDRESS: &str = "127.0.0.1";
@@ -34,7 +36,7 @@ impl Server {
             let stream = stream.expect("Cn't open TCP stream!");
             let config = self.config.clone();
 
-            pool.execute( || {
+            pool.execute(|| {
 //                Server::handle_connection(stream, config);
                 Server::handle_connection_new(stream, config);
             });
@@ -42,18 +44,57 @@ impl Server {
     }
 
     fn handle_connection_new(mut stream: TcpStream, config: Config) {
-        let mut request_buffer = String::new();
-        let number_of_bytes = stream.read_to_string(&mut request_buffer)
+        let mut buffer = [0; 1024];
+        stream.read(&mut buffer)
             .expect("Can't read from TCP stream!");
-        debug!("Received {} bytes as request.", number_of_bytes);
+        let mut request_buffer = String::new();
 
-        let request = http::parse_request(request_buffer.as_str());
+        for i in 0..buffer.len() {
+            let ch = buffer[i];
+
+            if ch == 0 {
+                break;
+            }
+
+            request_buffer.push(ch as char);
+        }
+
+        debug!("Received data: {:?}", request_buffer);
+
+        let request = http::parse_request(request_buffer.trim());
         debug!("Got request: {:?}", request);
-//
-//        stream.write("Hello, World!".as_bytes())
-//            .expect("Can't write to TCP stream!");
-//        stream.flush()
-//            .expect("Can't flush TCP stream!");
+
+        let response = match request.method().as_ref() {
+            "GET" => {
+                let filename = format!("{}/{}", config.dir(), request.url());
+
+                match File::open(filename) {
+                    Ok(mut f) => {
+                        let mut contents = String::new();
+                        f.read_to_string(&mut contents)
+                            .expect("Can't read resource file!");
+                        Response::new(
+                            String::from("1.1"),
+                            Status::Ok,
+                            contents)
+                    },
+                    Err(_) => {
+                        Response::new(
+                            String::from("1.1"),
+                            Status::NotFound,
+                            String::from("Not found!"))
+                    }
+                }
+            },
+            "HEAD" => panic!("HEAD not implemented yet!"), // TODO Implement it.
+            "OPTIONS" => panic!("OPTIONS not implemented yet!"), // TODO Implement it.
+            _ => panic!("Unsupported method"), // TODO Send appropriate response.
+        };
+
+        stream.write("Hello, World!\r\n".as_bytes())
+            .expect("Can't write to TCP stream!");
+        stream.flush()
+            .expect("Can't flush TCP stream!");
     }
 
     fn handle_connection(mut stream: TcpStream, config: Config) {
