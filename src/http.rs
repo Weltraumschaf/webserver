@@ -18,10 +18,6 @@ impl Request {
     pub fn url(&self) -> &String {
         &self.url
     }
-
-    pub fn version(&self) -> &String {
-        &self.version
-    }
 }
 
 #[derive(Debug)]
@@ -41,7 +37,7 @@ impl Response {
     }
 }
 
-#[derive(Debug, Copy,Clone)]
+#[derive(Debug, Copy, Clone)]
 pub enum Status {
     Ok,
     NotFound,

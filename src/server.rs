@@ -37,7 +37,6 @@ impl Server {
             let config = self.config.clone();
 
             pool.execute(|| {
-//                Server::handle_connection(stream, config);
                 Server::handle_connection_new(stream, config);
             });
         }
@@ -66,6 +65,7 @@ impl Server {
 
         let response = match request.method().as_ref() {
             "GET" => {
+                // FIXME Do not allow direcotry traversal.
                 let filename = format!("{}/{}", config.dir(), request.url());
 
                 match File::open(filename) {
@@ -91,33 +91,9 @@ impl Server {
             _ => panic!("Unsupported method"), // TODO Send appropriate response.
         };
 
-        stream.write("Hello, World!\r\n".as_bytes())
+        stream.write(response.render().as_bytes())
             .expect("Can't write to TCP stream!");
         stream.flush()
             .expect("Can't flush TCP stream!");
-    }
-
-    fn handle_connection(mut stream: TcpStream, config: Config) {
-        let mut buffer = [0; 512];
-        stream.read(&mut buffer).unwrap();
-
-        let get = b"GET / HTTP/1.1\r\n";
-
-        let (status_line, resource) = if buffer.starts_with(get) {
-            ("HTTP/1.1 200 OK\r\n\r\n", "hello.html")
-        } else {
-            ("HTTP/1.1 404 NOT FOUND\r\n\r\n", "404.html")
-        };
-
-        let filename = format!("{}/{}", config.dir(), resource);
-        let mut file = File::open(filename).unwrap();
-        let mut contents = String::new();
-
-        file.read_to_string(&mut contents).unwrap();
-
-        let response = format!("{}{}", status_line, contents);
-
-        stream.write(response.as_bytes()).unwrap();
-        stream.flush().unwrap();
     }
 }

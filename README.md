@@ -28,7 +28,7 @@ The goal of this project is to extend the basic implementation from the book wit
         - host name
 - logging to file
 - HTTP methods (wip)
-    - GET requests
+    - GET requests (done)
     - HEAD requests
     - OPTIONS request
     - error responses for unsupported methods
