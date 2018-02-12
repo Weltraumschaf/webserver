@@ -1,5 +1,7 @@
 # Minimalistic HTTP Server
 
+[![Build Status](https://travis-ci.org/Weltraumschaf/webserver.svg?branch=master)](https://travis-ci.org/Weltraumschaf/webserver)
+
 Based on the multithreaded example in the [Rust Book][rust-book].
 
 **This is not a production ready webserver!**
