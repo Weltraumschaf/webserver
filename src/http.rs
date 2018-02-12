@@ -1,3 +1,4 @@
+use std::fmt;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Request {
@@ -7,6 +8,53 @@ pub struct Request {
     host: String,
     user_agent: String,
     accept: String,
+}
+
+impl Request {
+    pub fn method(&self) -> &String {
+        &self.method
+    }
+
+    pub fn url(&self) -> &String {
+        &self.url
+    }
+
+    pub fn version(&self) -> &String {
+        &self.version
+    }
+}
+
+#[derive(Debug)]
+pub struct Response {
+    version: String,
+    status: Status,
+    body: String,
+}
+
+impl Response {
+    pub fn new(version: String, status: Status, body: String) -> Response {
+        Response { version, status, body }
+    }
+
+    pub fn render(&self) -> String {
+        format!("HTTP/{} {}\r\n\r\n{}", self.version, self.status, self.body)
+    }
+}
+
+#[derive(Debug, Copy,Clone)]
+pub enum Status {
+    Ok,
+    NotFound,
+}
+
+impl fmt::Display for Status {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let printable = match *self {
+            Status::Ok => "200 OK",
+            Status::NotFound => "404 NOT FOUND",
+        };
+        write!(f, "{}", printable)
+    }
 }
 
 #[derive(Debug)]
@@ -284,6 +332,22 @@ mod tests {
                     user_agent: String::from("curl/7.54.0"),
                     accept: String::from("*/*"),
                 }
+            ))
+        );
+    }
+
+    #[test]
+    fn test_render_response() {
+        let sut = Response::new(
+            String::from("1.1"),
+            Status::Ok,
+            String::from("Hello. World!")
+        );
+
+        assert_that!(
+            sut.render(),
+            is(equal_to(
+                String::from("HTTP/1.1 200 OK\r\n\r\nHello. World!")
             ))
         );
     }
