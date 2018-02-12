@@ -126,26 +126,32 @@ fn scan_request(request: &str) -> Vec<RequestToken> {
 
 pub fn parse_request(request: &str) -> Request {
     let mut builder = RequestBuilder::new();
-    let mut tokens = scan_request(request).iter();
+    let tokens = scan_request(request);
+    let mut tokens_iterator = tokens.iter();
 
     loop {
-        match tokens.next().unwrap() {
-            &RequestToken::Method(method) => builder.with_method(&method),
-            &RequestToken::Url(url) => builder.with_url(&url),
-            &RequestToken::Version(version) => builder.with_version(&version),
-            &RequestToken::HeaderName(name) => {
-                let value_token = tokens.next()
-                    .expect(format!("Expecting a value for header '{}'!", &name).as_str());
-                let &RequestToken::HeaderValue(value) = value_token;
+        let token = tokens_iterator.next()
+            .expect("No more tokens_iterator, but expected more!");
 
-                match name {
-                    "Host" => builder.with_host(&value),
-                    "User-Agent" => builder.with_user_agent(&value),
-                    "Accept" => builder.with_accept(&value),
+        match token {
+            &RequestToken::Method(ref method) => builder.with_method(&method),
+            &RequestToken::Url(ref url) => builder.with_url(&url),
+            &RequestToken::Version(ref version) => builder.with_version(&version),
+            &RequestToken::HeaderName(ref name) => {
+                let value_token = tokens_iterator.next()
+                    .expect(format!("Expecting a value for header '{}'!", &name).as_str());
+
+                if let &RequestToken::HeaderValue(ref value) = value_token {
+                    match name.as_str() {
+                        "Host" => builder.with_host(&value.clone()),
+                        "User-Agent" => builder.with_user_agent(&value.clone()),
+                        "Accept" => builder.with_accept(&value.clone()),
+                        _ => panic!("Unexpected header name '{}'!", name),
+                    }
                 }
             },
-            &RequestToken::HeaderValue(value) => panic!("Should not happen!"),
             &RequestToken::EndOfText => break,
+            _ => panic!("Should not happen!"),
         }
     }
 
