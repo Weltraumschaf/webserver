@@ -46,21 +46,10 @@ impl Server {
         let mut buffer = [0; 1024];
         stream.read(&mut buffer)
             .expect("Can't read from TCP stream!");
-        let mut request_buffer = String::new();
+        let request = byte_array_to_string(buffer);
+        debug!("Received data: {:?}", request);
 
-        for i in 0..buffer.len() {
-            let ch = buffer[i];
-
-            if ch == 0 {
-                break;
-            }
-
-            request_buffer.push(ch as char);
-        }
-
-        debug!("Received data: {:?}", request_buffer);
-
-        let request = http::parse_request(request_buffer.trim());
+        let request = http::parse_request(request.trim());
         debug!("Got request: {:?}", request);
 
         let response = match request.method().as_ref() {
@@ -96,4 +85,20 @@ impl Server {
         stream.flush()
             .expect("Can't flush TCP stream!");
     }
+}
+
+fn byte_array_to_string(input: [u8; 1024]) -> String {
+    let mut output = String::new();
+
+    for i in 0..input.len() {
+        let ch = input[i];
+
+        if ch == 0 {
+            break;
+        }
+
+        output.push(ch as char);
+    }
+
+    output
 }
