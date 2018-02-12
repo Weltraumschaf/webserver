@@ -94,7 +94,8 @@ fn parse_first_line(line: &str) -> (RequestToken, RequestToken, RequestToken) {
 }
 
 fn parse_non_first_line(line: &str) -> (RequestToken, RequestToken) {
-    let colon_position = line.find(":").unwrap();
+    let colon_position = line.find(":")
+        .expect("No colon found in line!");
     let header_name = line[0..colon_position].trim();
     let header_value = line[colon_position + 1..].trim();
 
