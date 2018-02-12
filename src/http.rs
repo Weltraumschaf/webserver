@@ -40,7 +40,9 @@ impl Response {
 #[derive(Debug, Copy, Clone)]
 pub enum Status {
     Ok,
+    // Client errors 4xx - 499
     NotFound,
+    MethodNotAllowed,
 }
 
 impl fmt::Display for Status {
@@ -48,6 +50,7 @@ impl fmt::Display for Status {
         let printable = match *self {
             Status::Ok => "200 OK",
             Status::NotFound => "404 NOT FOUND",
+            Status::MethodNotAllowed => "405 METHOD NOT ALLOWED",
         };
         write!(f, "{}", printable)
     }

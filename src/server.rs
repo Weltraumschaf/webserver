@@ -81,9 +81,9 @@ fn byte_array_to_string(input: [u8; 1024]) -> String {
 fn build_response(config: Config, request: Request) -> Response {
     match request.method().as_ref() {
         "GET" => handle_get_request(config, request),
-        "HEAD" => panic!("HEAD not implemented yet!"), // TODO Implement it.
-        "OPTIONS" => panic!("OPTIONS not implemented yet!"), // TODO Implement it.
-        _ => panic!("Unsupported method"), // TODO Send appropriate response.
+        "HEAD" => handle_head_request(config, request),
+        "OPTIONS" => handle_options_request(config, request),
+        _ => handle_unsupported_request(),
     }
 }
 
@@ -108,4 +108,20 @@ fn handle_get_request(config: Config, request: Request) -> Response {
                 String::from("Not found!"))
         }
     }
+}
+
+fn handle_head_request(config: Config, request: Request) -> Response {
+    panic!("HEAD not implemented yet!"); // TODO Implement it.
+}
+
+fn handle_options_request(config: Config, request: Request) -> Response {
+    panic!("OPTIONS not implemented yet!"); // TODO Implement it.
+}
+
+fn handle_unsupported_request() -> Response {
+    // FIXME Add Allow: header with allowed methods.
+    Response::new(
+        String::from("1.1"),
+        Status::MethodNotAllowed,
+        String::from("Method not supported by this HTTP server implementation!"))
 }
