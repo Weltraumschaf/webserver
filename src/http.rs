@@ -126,6 +126,10 @@ fn scan_request(request: &str) -> Vec<RequestToken> {
 }
 
 pub fn parse_request(request: &str) -> Request {
+    if request.is_empty() {
+        panic!("Empty request input!");
+    }
+
     let mut builder = RequestBuilder::new();
     let tokens = scan_request(request);
     let mut tokens_iterator = tokens.iter();
