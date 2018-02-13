@@ -409,6 +409,11 @@ mod tests {
                     host: String::from("localhost:8080"),
                     user_agent: String::from("curl/7.54.0"),
                     accept: String::from("*/*"),
+                    upgrade_insecure_requests: String::from(""),
+                    accept_language: String::from(""),
+                    accept_encoding: String::from(""),
+                    cookie: String::from(""),
+                    connection: String::from(""),
                 }
             ))
         );
