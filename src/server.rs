@@ -152,6 +152,7 @@ fn determine_content_type(file_name: &String) -> String {
         "html" | "htm" => String::from("text/html"),
         "css" => String::from("text/css"),
         "js" => String::from("text/javascript"),
+        "ico" => String::from("image/x-icon"),
         _ => String::from("text/plain") ,
     }
 }
@@ -194,6 +195,14 @@ mod tests {
         assert_that!(
             determine_content_type(&String::from("/foo/bar/new.index.js")),
             is(equal_to(String::from("text/javascript")))
+        );
+        assert_that!(
+            determine_content_type(&String::from("/foo/bar/new.index.js")),
+            is(equal_to(String::from("text/javascript")))
+        );
+        assert_that!(
+            determine_content_type(&String::from("/foo/bar/favicon.ico")),
+            is(equal_to(String::from("image/x-icon")))
         );
     }
 
