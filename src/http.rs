@@ -165,16 +165,25 @@ impl Response {
     }
 }
 
+// https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
 #[derive(Debug)]
 pub enum ResponseHeader {
     // Allow: GET, POST, HEAD
     Allow(String),
+    Server(String),
+    // Accept-Ranges: none
+    AcceptRanges(String),
+    // Content-Type: text/html; charset=utf-8
+    ContentType(String),
 }
 
 impl fmt::Display for ResponseHeader {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let printable = match *self {
             ResponseHeader::Allow(ref value) => format!("Allow: {}", value),
+            ResponseHeader::Server(ref value) => format!("Server: {}", value),
+            ResponseHeader::AcceptRanges(ref value) => format!("Accept-Ranges: {}", value),
+            ResponseHeader::ContentType(ref value) => format!("Content-Type: {}", value),
         };
         write!(f, "{}", printable)
     }

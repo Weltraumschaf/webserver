@@ -33,9 +33,11 @@ The goal of this project is to extend the basic implementation from the book wit
     - GET requests (done)
     - HEAD requests
     - OPTIONS request
-    - error responses for unsupported methods
+    - error responses for unsupported methods (done)
 - custom error pages
 - graceful shutdown on `ctrl + c`
-- basic header in the response
-    - ...
+- basic header in the response (wip)
+    - server (done)
+    - accept-range/content-type w/ hard coded default (done)
+    - content-type w/ right type
     

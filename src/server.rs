@@ -90,7 +90,7 @@ fn handle_get_request(config: Config, request: Request) -> Response {
     // FIXME Handle dir (/) to look for index.html or index.html.
     let filename = format!("{}/{}", config.dir(), request.url());
 
-    match File::open(filename) {
+    let mut response = match File::open(filename) {
         Ok(mut f) => {
             let mut contents = String::new();
             // FIXME Handle binary data.
@@ -107,7 +107,11 @@ fn handle_get_request(config: Config, request: Request) -> Response {
                 Status::NotFound,
                 String::from("Not found!"))
         }
-    }
+    };
+    response.add_header(ResponseHeader::Server(String::from("Weltraumschaf's Webserver")));
+    response.add_header(ResponseHeader::AcceptRanges(String::from("none")));
+    response.add_header(ResponseHeader::ContentType(String::from("text/html; charset=utf-8")));
+    response
 }
 
 fn handle_head_request(config: Config, request: Request) -> Response {
