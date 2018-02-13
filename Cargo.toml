@@ -2,6 +2,10 @@
 name = "webserver"
 version = "1.0.0"
 authors = ["Sven Strittmatter <ich@weltraumschaf.de>"]
+repository = "https://github.com/Weltraumschaf/webserver"
+readme = "README.md"
+license = "http://weltraumschaf.de/the-beer-ware-license.txt"
+travis-ci = { repository = "weltraumschaf/webserver", branch = "master" }
 
 [dependencies]
 clap = "2.29.2"

@@ -8,8 +8,19 @@ Based on the multithreaded example in the [Rust Book][rust-book].
 
 The goal of this project is to extend the basic implementation from the book with some useful features to learn [Rust][rust-lang].
 
-[rust-book]:    https://doc.rust-lang.org/stable/book/second-edition/ch20-00-final-project-a-web-server.html
-[rust-lang]:    https://www.rust-lang.org/
+## Build and Run
+
+To build the webserver just run [Cargo][cargo] in the project root directory:
+
+```bash
+cargo build
+```
+
+And then invoke the binary with a path to a web root directory in the project root directory:
+
+```bash
+./target/debug/webserver -d web_root/
+```
 
 ## Wanted features
 
@@ -41,3 +52,6 @@ The goal of this project is to extend the basic implementation from the book wit
     - accept-range/content-type w/ hard coded default (done)
     - content-type w/ right type
     
+[rust-book]:    https://doc.rust-lang.org/stable/book/second-edition/ch20-00-final-project-a-web-server.html
+[rust-lang]:    https://www.rust-lang.org/
+[cargo]:        https://doc.rust-lang.org/cargo/
