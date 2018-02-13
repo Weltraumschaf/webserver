@@ -13,6 +13,8 @@ pub struct Request {
     accept_encoding: String,
     cookie: String,
     connection: String,
+    referer: String,
+    cache_control: String,
 }
 
 impl Request {
@@ -22,6 +24,113 @@ impl Request {
 
     pub fn url(&self) -> &String {
         &self.url
+    }
+}
+
+#[derive(Debug)]
+struct RequestBuilder {
+    method: String,
+    url: String,
+    version: String,
+    host: String,
+    user_agent: String,
+    accept: String,
+    upgrade_insecure_requests: String,
+    accept_language: String,
+    accept_encoding: String,
+    cookie: String,
+    connection: String,
+    referer: String,
+    cache_control: String,
+}
+
+impl RequestBuilder {
+    fn new() -> RequestBuilder {
+        RequestBuilder {
+            method: String::from(""),
+            url: String::from(""),
+            version: String::from(""),
+            host: String::from(""),
+            user_agent: String::from(""),
+            accept: String::from(""),
+            upgrade_insecure_requests: String::from(""),
+            accept_language: String::from(""),
+            accept_encoding: String::from(""),
+            cookie: String::from(""),
+            connection: String::from(""),
+            referer: String::from(""),
+            cache_control: String::from(""),
+        }
+    }
+
+    fn create(&self) -> Request {
+        Request {
+            method: self.method.clone(),
+            url: self.url.clone(),
+            version: self.version.clone(),
+            host: self.host.clone(),
+            user_agent: self.user_agent.clone(),
+            accept: self.accept.clone(),
+            upgrade_insecure_requests: self.upgrade_insecure_requests.clone(),
+            accept_language: self.accept_language.clone(),
+            accept_encoding: self.accept_encoding.clone(),
+            cookie: self.cookie.clone(),
+            connection: self.connection.clone(),
+            referer: self.referer.clone(),
+            cache_control: self.cache_control.clone(),
+        }
+    }
+
+    fn with_method(&mut self, new_method: &String) {
+        self.method = new_method.clone();
+    }
+
+    fn with_url(&mut self, new_url: &String) {
+        self.url = new_url.clone();
+    }
+
+    fn with_version(&mut self, new_version: &String) {
+        self.version = new_version.clone();
+    }
+
+    fn with_host(&mut self, new_host: &String) {
+        self.host = new_host.clone();
+    }
+
+    fn with_user_agent(&mut self, new_user_agent: &String) {
+        self.user_agent = new_user_agent.clone();
+    }
+
+    fn with_accept(&mut self, new_accept: &String) {
+        self.accept = new_accept.clone();
+    }
+
+    fn with_accept_language(&mut self, new_accept_language: &String) {
+        self.accept_language = new_accept_language.clone();
+    }
+
+    fn with_accept_encoding(&mut self, new_accept_encoding: &String) {
+        self.accept_encoding = new_accept_encoding.clone();
+    }
+
+    fn with_cookie(&mut self, new_cookie: &String) {
+        self.cookie = new_cookie.clone();
+    }
+
+    fn with_connection(&mut self, new_connection: &String) {
+        self.connection = new_connection.clone();
+    }
+
+    fn with_upgrade_insecure_requests(&mut self, new_upgrade_insecure_requests: &String) {
+        self.upgrade_insecure_requests = new_upgrade_insecure_requests.clone();
+    }
+
+    fn with_referer(&mut self, new_referer: &String) {
+        self.referer = new_referer.clone();
+    }
+
+    fn with_cache_control(&mut self, new_cache_control: &String) {
+        self.cache_control = new_cache_control.clone();
     }
 }
 
@@ -92,99 +201,6 @@ impl fmt::Display for Status {
             Status::NotImplemented => "501 NOT IMPLEMENTED",
         };
         write!(f, "{}", printable)
-    }
-}
-
-#[derive(Debug)]
-struct RequestBuilder {
-    method: String,
-    url: String,
-    version: String,
-    host: String,
-    user_agent: String,
-    accept: String,
-    upgrade_insecure_requests: String,
-    accept_language: String,
-    accept_encoding: String,
-    cookie: String,
-    connection: String,
-}
-
-impl RequestBuilder {
-    fn new() -> RequestBuilder {
-        RequestBuilder {
-            method: String::from(""),
-            url: String::from(""),
-            version: String::from(""),
-            host: String::from(""),
-            user_agent: String::from(""),
-            accept: String::from(""),
-            upgrade_insecure_requests: String::from(""),
-            accept_language: String::from(""),
-            accept_encoding: String::from(""),
-            cookie: String::from(""),
-            connection: String::from(""),
-        }
-    }
-
-    fn create(&self) -> Request {
-        Request {
-            method: self.method.clone(),
-            url: self.url.clone(),
-            version: self.version.clone(),
-            host: self.host.clone(),
-            user_agent: self.user_agent.clone(),
-            accept: self.accept.clone(),
-            upgrade_insecure_requests: self.upgrade_insecure_requests.clone(),
-            accept_language: self.accept_language.clone(),
-            accept_encoding: self.accept_encoding.clone(),
-            cookie: self.cookie.clone(),
-            connection: self.connection.clone(),
-        }
-    }
-
-    fn with_method(&mut self, new_method: &String) {
-        self.method = new_method.clone();
-    }
-
-    fn with_url(&mut self, new_url: &String) {
-        self.url = new_url.clone();
-    }
-
-    fn with_version(&mut self, new_version: &String) {
-        self.version = new_version.clone();
-    }
-
-    fn with_host(&mut self, new_host: &String) {
-        self.host = new_host.clone();
-    }
-
-    fn with_user_agent(&mut self, new_user_agent: &String) {
-        self.user_agent = new_user_agent.clone();
-    }
-
-    fn with_accept(&mut self, new_accept: &String) {
-        self.accept = new_accept.clone();
-    }
-
-    fn with_accept_language(&mut self, new_accept_language: &String) {
-        self.accept_language = new_accept_language.clone();
-    }
-
-    fn with_accept_encoding(&mut self, new_accept_encoding: &String) {
-        self.accept_encoding = new_accept_encoding.clone();
-    }
-
-    fn with_cookie(&mut self, new_cookie: &String) {
-        self.cookie = new_cookie.clone();
-    }
-
-    fn with_connection(&mut self, new_connection: &String) {
-        self.connection = new_connection.clone();
-    }
-
-    fn with_upgrade_insecure_requests(&mut self, new_upgrade_insecure_requests: &String) {
-        self.upgrade_insecure_requests = new_upgrade_insecure_requests.clone();
     }
 }
 
@@ -278,6 +294,8 @@ pub fn parse_request(request: &str) -> Request {
                         "Cookie" => builder.with_cookie(&value.clone()),
                         "Connection" => builder.with_connection(&value.clone()),
                         "Upgrade-Insecure-Requests" => builder.with_upgrade_insecure_requests(&value.clone()),
+                        "Referer" => builder.with_referer(&value.clone()),
+                        "Cache-Control" => builder.with_cache_control(&value.clone()),
                         _ => debug!("Unexpected header name '{}'!", name),
                     }
                 }
@@ -414,6 +432,34 @@ mod tests {
                     accept_encoding: String::from(""),
                     cookie: String::from(""),
                     connection: String::from(""),
+                    referer: String::from(""),
+                    cache_control: String::from(""),
+                }
+            ))
+        );
+    }
+
+    #[test]
+    fn test_parse_request_firefox() {
+        let request_fixture = "GET /hello.html HTTP/1.1\r\nHost: localhost:8080\r\nUser-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:58.0) Gecko/20100101 Firefox/58.0\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\nAccept-Language: en,en-US;q=0.7,de;q=0.3\r\nAccept-Encoding: gzip, deflate\r\nReferer: http://localhost:8080/index.html\r\nCookie: _ga=GA1.1.822344465.1506073564; JSESSIONID=node0ag061949mqugevd0gpoadofu2.node0; teamscale-session-8080=admin:A9H8KhGk7eCIm4TR_TJqLKPiJ8Vgm9yQ; io=ngTvRgwb_vVkB9ckAAAP; NXSESSIONID=7f81c463-4a5e-4bc4-9040-8b9779ce9f41; token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdGF0dXMiOiJzdWNjZXNzIiwiZGF0YSI6eyJpZCI6MSwiZW1haWwiOiJhZG1pbkBqdWljZS1zaC5vcCIsInBhc3N3b3JkIjoiMDE5MjAyM2E3YmJkNzMyNTA1MTZmMDY5ZGYxOGI1MDAiLCJjcmVhdGVkQXQiOiIyMDE3LTEwLTIyIDEzOjAxOjIyLjAwMCArMDA6MDAiLCJ1cGRhdGVkQXQiOiIyMDE3LTEwLTIyIDEzOjAxOjIyLjAwMCArMDA6MDAifSwiaWF0IjoxNTA4Njc3OTM4LCJleHAiOjE1MDg2OTU5Mzh9.YJkvadkpWXgx6IpjdrXRv8MurV8Tlms1npl2yqa8pm8\r\nConnection: keep-alive\r\nUpgrade-Insecure-Requests: 1\r\nCache-Control: max-age=0\r\n\r\n";
+
+        assert_that!(
+            parse_request(request_fixture),
+            is(equal_to(
+                Request {
+                    method: String::from("GET"),
+                    url: String::from("/hello.html"),
+                    version: String::from("1.1"),
+                    host: String::from("localhost:8080"),
+                    user_agent: String::from("Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:58.0) Gecko/20100101 Firefox/58.0"),
+                    accept: String::from("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"),
+                    upgrade_insecure_requests: String::from("1"),
+                    accept_language: String::from("en,en-US;q=0.7,de;q=0.3"),
+                    accept_encoding: String::from("gzip, deflate"),
+                    cookie: String::from("_ga=GA1.1.822344465.1506073564; JSESSIONID=node0ag061949mqugevd0gpoadofu2.node0; teamscale-session-8080=admin:A9H8KhGk7eCIm4TR_TJqLKPiJ8Vgm9yQ; io=ngTvRgwb_vVkB9ckAAAP; NXSESSIONID=7f81c463-4a5e-4bc4-9040-8b9779ce9f41; token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdGF0dXMiOiJzdWNjZXNzIiwiZGF0YSI6eyJpZCI6MSwiZW1haWwiOiJhZG1pbkBqdWljZS1zaC5vcCIsInBhc3N3b3JkIjoiMDE5MjAyM2E3YmJkNzMyNTA1MTZmMDY5ZGYxOGI1MDAiLCJjcmVhdGVkQXQiOiIyMDE3LTEwLTIyIDEzOjAxOjIyLjAwMCArMDA6MDAiLCJ1cGRhdGVkQXQiOiIyMDE3LTEwLTIyIDEzOjAxOjIyLjAwMCArMDA6MDAifSwiaWF0IjoxNTA4Njc3OTM4LCJleHAiOjE1MDg2OTU5Mzh9.YJkvadkpWXgx6IpjdrXRv8MurV8Tlms1npl2yqa8pm8"),
+                    connection: String::from("keep-alive"),
+                    referer: String::from("http://localhost:8080/index.html"),
+                    cache_control: String::from("max-age=0"),
                 }
             ))
         );

@@ -42,7 +42,7 @@ impl Server {
     }
 
     fn handle_connection_new(mut stream: TcpStream, config: Config) {
-        let mut buffer = [0; 1024];
+        let mut buffer = [0; 4096];
         stream.read(&mut buffer)
             .expect("Can't read from TCP stream!");
         let request = byte_array_to_string(buffer);
@@ -60,7 +60,7 @@ impl Server {
     }
 }
 
-fn byte_array_to_string(input: [u8; 1024]) -> String {
+fn byte_array_to_string(input: [u8; 4096]) -> String {
     let mut output = String::new();
 
     for i in 0..input.len() {
@@ -112,7 +112,7 @@ fn handle_get_request(config: Config, request: Request) -> Response {
 
 fn handle_head_request(config: Config, request: Request) -> Response {
     // TODO Implement it.
-    let mut response = Response::new(
+    let response = Response::new(
         String::from("1.1"),
         Status::NotImplemented,
         String::from("Method not implemented yet!"));
@@ -121,7 +121,7 @@ fn handle_head_request(config: Config, request: Request) -> Response {
 
 fn handle_options_request(config: Config, request: Request) -> Response {
      // TODO Implement it.
-    let mut response = Response::new(
+    let response = Response::new(
         String::from("1.1"),
         Status::NotImplemented,
         String::from("Method not implemented yet!"));
