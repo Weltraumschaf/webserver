@@ -37,7 +37,13 @@ impl Response {
     }
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug)]
+pub enum ResponseHeader {
+    // Allow: GET, POST, HEAD
+    Allow(String),
+}
+
+#[derive(Debug)]
 pub enum Status {
     Ok,
     // Client errors 4xx - 499
@@ -349,5 +355,12 @@ mod tests {
                 String::from("HTTP/1.1 200 OK\r\n\r\nHello. World!")
             ))
         );
+    }
+
+    #[test]
+    fn status_fmt() {
+        assert_that!(format!("{}", Status::Ok).as_str(), is(equal_to("200 OK")));
+        assert_that!(format!("{}", Status::NotFound).as_str(), is(equal_to("404 NOT FOUND")));
+        assert_that!(format!("{}", Status::MethodNotAllowed).as_str(), is(equal_to("405 METHOD NOT ALLOWED")));
     }
 }
