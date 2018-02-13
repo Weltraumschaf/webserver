@@ -24,16 +24,30 @@ impl Request {
 pub struct Response {
     version: String,
     status: Status,
+    headers: Vec<ResponseHeader>,
     body: String,
 }
 
 impl Response {
     pub fn new(version: String, status: Status, body: String) -> Response {
-        Response { version, status, body }
+        Response { version, status, headers: Vec::new(), body }
     }
 
     pub fn render(&self) -> String {
-        format!("HTTP/{} {}\r\n\r\n{}", self.version, self.status, self.body)
+        let mut buffer = String::new();
+        buffer.push_str(format!("HTTP/{} {}\r\n", self.version, self.status).as_str());
+
+        for header in self.headers.iter() {
+            buffer.push_str(format!("{}\r\n", header).as_str());
+        }
+
+        buffer.push_str("\r\n");
+        buffer.push_str(self.body.as_str());
+        buffer
+    }
+
+    pub fn add_header(&mut self, header: ResponseHeader) {
+        self.headers.push(header);
     }
 }
 
@@ -351,17 +365,35 @@ mod tests {
     }
 
     #[test]
-    fn test_render_response() {
+    fn test_render_response_without_headers() {
         let sut = Response::new(
             String::from("1.1"),
             Status::Ok,
-            String::from("Hello. World!")
+            String::from("Hello, World!")
         );
 
         assert_that!(
             sut.render(),
             is(equal_to(
-                String::from("HTTP/1.1 200 OK\r\n\r\nHello. World!")
+                String::from("HTTP/1.1 200 OK\r\n\r\nHello, World!")
+            ))
+        );
+    }
+
+    #[test]
+    fn test_render_response_with_headers() {
+        let mut sut = Response::new(
+            String::from("1.1"),
+            Status::MethodNotAllowed,
+            String::from("This is not allowed!")
+        );
+
+        sut.add_header(ResponseHeader::Allow(String::from("GET, POST, HEAD")));
+
+        assert_that!(
+            sut.render(),
+            is(equal_to(
+                String::from("HTTP/1.1 405 METHOD NOT ALLOWED\r\nAllow: GET, POST, HEAD\r\n\r\nThis is not allowed!")
             ))
         );
     }
