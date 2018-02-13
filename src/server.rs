@@ -87,11 +87,13 @@ fn build_response(config: Config, request: Request) -> Response {
 
 fn handle_get_request(config: Config, request: Request) -> Response {
     // FIXME Do not allow directory traversal.
+    // FIXME Handle dir (/) to look for index.html or index.html.
     let filename = format!("{}/{}", config.dir(), request.url());
 
     match File::open(filename) {
         Ok(mut f) => {
             let mut contents = String::new();
+            // FIXME Handle binary data.
             f.read_to_string(&mut contents)
                 .expect("Can't read resource file!");
             Response::new(

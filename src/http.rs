@@ -8,6 +8,11 @@ pub struct Request {
     host: String,
     user_agent: String,
     accept: String,
+    upgrade_insecure_requests: String,
+    accept_language: String,
+    accept_encoding: String,
+    cookie: String,
+    connection: String,
 }
 
 impl Request {
@@ -98,6 +103,11 @@ struct RequestBuilder {
     host: String,
     user_agent: String,
     accept: String,
+    upgrade_insecure_requests: String,
+    accept_language: String,
+    accept_encoding: String,
+    cookie: String,
+    connection: String,
 }
 
 impl RequestBuilder {
@@ -109,6 +119,11 @@ impl RequestBuilder {
             host: String::from(""),
             user_agent: String::from(""),
             accept: String::from(""),
+            upgrade_insecure_requests: String::from(""),
+            accept_language: String::from(""),
+            accept_encoding: String::from(""),
+            cookie: String::from(""),
+            connection: String::from(""),
         }
     }
 
@@ -120,6 +135,11 @@ impl RequestBuilder {
             host: self.host.clone(),
             user_agent: self.user_agent.clone(),
             accept: self.accept.clone(),
+            upgrade_insecure_requests: self.upgrade_insecure_requests.clone(),
+            accept_language: self.accept_language.clone(),
+            accept_encoding: self.accept_encoding.clone(),
+            cookie: self.cookie.clone(),
+            connection: self.connection.clone(),
         }
     }
 
@@ -145,6 +165,26 @@ impl RequestBuilder {
 
     fn with_accept(&mut self, new_accept: &String) {
         self.accept = new_accept.clone();
+    }
+
+    fn with_accept_language(&mut self, new_accept_language: &String) {
+        self.accept_language = new_accept_language.clone();
+    }
+
+    fn with_accept_encoding(&mut self, new_accept_encoding: &String) {
+        self.accept_encoding = new_accept_encoding.clone();
+    }
+
+    fn with_cookie(&mut self, new_cookie: &String) {
+        self.cookie = new_cookie.clone();
+    }
+
+    fn with_connection(&mut self, new_connection: &String) {
+        self.connection = new_connection.clone();
+    }
+
+    fn with_upgrade_insecure_requests(&mut self, new_upgrade_insecure_requests: &String) {
+        self.upgrade_insecure_requests = new_upgrade_insecure_requests.clone();
     }
 }
 
@@ -233,7 +273,12 @@ pub fn parse_request(request: &str) -> Request {
                         "Host" => builder.with_host(&value.clone()),
                         "User-Agent" => builder.with_user_agent(&value.clone()),
                         "Accept" => builder.with_accept(&value.clone()),
-                        _ => panic!("Unexpected header name '{}'!", name),
+                        "Accept-Language" => builder.with_accept_language(&value.clone()),
+                        "Accept-Encoding" => builder.with_accept_encoding(&value.clone()),
+                        "Cookie" => builder.with_cookie(&value.clone()),
+                        "Connection" => builder.with_connection(&value.clone()),
+                        "Upgrade-Insecure-Requests" => builder.with_upgrade_insecure_requests(&value.clone()),
+                        _ => debug!("Unexpected header name '{}'!", name),
                     }
                 }
             },
