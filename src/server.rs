@@ -109,11 +109,21 @@ fn handle_get_request(config: Config, request: Request) -> Response {
 }
 
 fn handle_head_request(config: Config, request: Request) -> Response {
-    panic!("HEAD not implemented yet!"); // TODO Implement it.
+    // TODO Implement it.
+    let mut response = Response::new(
+        String::from("1.1"),
+        Status::NotImplemented,
+        String::from("Method not implemented yet!"));
+    response
 }
 
 fn handle_options_request(config: Config, request: Request) -> Response {
-    panic!("OPTIONS not implemented yet!"); // TODO Implement it.
+     // TODO Implement it.
+    let mut response = Response::new(
+        String::from("1.1"),
+        Status::NotImplemented,
+        String::from("Method not implemented yet!"));
+    response
 }
 
 fn handle_unsupported_request() -> Response {

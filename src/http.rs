@@ -69,9 +69,12 @@ impl fmt::Display for ResponseHeader {
 #[derive(Debug)]
 pub enum Status {
     Ok,
-    // Client errors 4xx - 499
+    // Client errors 400 - 499
     NotFound,
     MethodNotAllowed,
+    // Server errors 500 - 599
+    InternalServerError,
+    NotImplemented,
 }
 
 impl fmt::Display for Status {
@@ -80,6 +83,8 @@ impl fmt::Display for Status {
             Status::Ok => "200 OK",
             Status::NotFound => "404 NOT FOUND",
             Status::MethodNotAllowed => "405 METHOD NOT ALLOWED",
+            Status::InternalServerError => "500 INTERNAL SERVER ERROR",
+            Status::NotImplemented => "501 NOT IMPLEMENTED",
         };
         write!(f, "{}", printable)
     }
@@ -409,6 +414,12 @@ mod tests {
         assert_that!(
             format!("{}", Status::MethodNotAllowed).as_str(),
             is(equal_to("405 METHOD NOT ALLOWED")));
+        assert_that!(
+            format!("{}", Status::InternalServerError).as_str(),
+            is(equal_to("500 INTERNAL SERVER ERROR")));
+        assert_that!(
+            format!("{}", Status::NotImplemented).as_str(),
+            is(equal_to("501 NOT IMPLEMENTED")));
     }
 
     #[test]
