@@ -90,27 +90,33 @@ fn handle_get_request(config: Config, request: Request) -> Response {
     // FIXME Handle dir (/) to look for index.html or index.html.
     let filename = format!("{}/{}", config.dir(), request.url());
 
-    let mut response = match File::open(filename) {
+    let mut response = match File::open(&filename) {
         Ok(mut f) => {
             let mut contents = String::new();
             // FIXME Handle binary data.
             f.read_to_string(&mut contents)
                 .expect("Can't read resource file!");
-            Response::new(
+            let mut response = Response::new(
                 String::from("1.1"),
                 Status::Ok,
-                contents)
+                contents);
+            response.add_header(
+                ResponseHeader::ContentType(
+                    format!("{}; charset=utf-8",
+                        determine_content_type(&filename))));
+            response
         },
         Err(_) => {
-            Response::new(
+            let mut response = Response::new(
                 String::from("1.1"),
                 Status::NotFound,
-                String::from("Not found!"))
+                String::from("Not found!"));
+            response.add_header(ResponseHeader::ContentType(String::from("text/plain; charset=utf-8")));
+            response
         }
     };
     response.add_header(ResponseHeader::Server(String::from("Weltraumschaf's Webserver")));
     response.add_header(ResponseHeader::AcceptRanges(String::from("none")));
-    response.add_header(ResponseHeader::ContentType(String::from("text/html; charset=utf-8")));
     response
 }
 
@@ -124,7 +130,7 @@ fn handle_head_request(config: Config, request: Request) -> Response {
 }
 
 fn handle_options_request(config: Config, request: Request) -> Response {
-     // TODO Implement it.
+    // TODO Implement it.
     let response = Response::new(
         String::from("1.1"),
         Status::NotImplemented,
@@ -139,4 +145,83 @@ fn handle_unsupported_request() -> Response {
         String::from("Method not supported by this HTTP server implementation!"));
     response.add_header(ResponseHeader::Allow(String::from("GET, OPTIONS, HEAD")));
     response
+}
+
+fn determine_content_type(file_name: &String) -> String {
+    match extract_file_extension(&file_name).as_ref() {
+        "html" | "htm" => String::from("text/html"),
+        "css" => String::from("text/css"),
+        "js" => String::from("text/javascript"),
+        _ => String::from("text/plain") ,
+    }
+}
+
+fn extract_file_extension(file_name: &String) -> String {
+    match file_name.rfind(".") {
+        Some(pos) => file_name[pos + 1..].to_string(),
+        None => String::from(""),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use hamcrest::prelude::*;
+
+    #[test]
+    #[ignore]
+    fn test_determine_content_type_from_file_name() {
+        assert_that!(
+            determine_content_type(&String::from("")),
+            is(equal_to(String::from("text/plain")))
+        );
+        assert_that!(
+            determine_content_type(&String::from("index.html")),
+            is(equal_to(String::from("text/html")))
+        );
+        assert_that!(
+            determine_content_type(&String::from("new.index.htm")),
+            is(equal_to(String::from("text/html")))
+        );
+        assert_that!(
+            determine_content_type(&String::from("/foo/bar/new.index.html")),
+            is(equal_to(String::from("text/html")))
+        );
+        assert_that!(
+            determine_content_type(&String::from("foo.abr.css")),
+            is(equal_to(String::from("text/css")))
+        );
+        assert_that!(
+            determine_content_type(&String::from("/foo/bar/new.index.js")),
+            is(equal_to(String::from("text/javascript")))
+        );
+    }
+
+    #[test]
+    fn test_extract_file_extension() {
+        assert_that!(
+            extract_file_extension(&String::from("")),
+            is(equal_to(String::from("")))
+        );
+        assert_that!(
+            extract_file_extension(&String::from("index.html")),
+            is(equal_to(String::from("html")))
+        );
+        assert_that!(
+            extract_file_extension(&String::from("new.index.htm")),
+            is(equal_to(String::from("htm")))
+        );
+        assert_that!(
+            extract_file_extension(&String::from("/foo/bar/new.index.html")),
+            is(equal_to(String::from("html")))
+        );
+        assert_that!(
+            extract_file_extension(&String::from("foo.abr.css")),
+            is(equal_to(String::from("css")))
+        );
+        assert_that!(
+            extract_file_extension(&String::from("/foo/bar/new.index.js")),
+            is(equal_to(String::from("js")))
+        );
+    }
 }
