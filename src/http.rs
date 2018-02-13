@@ -43,6 +43,15 @@ pub enum ResponseHeader {
     Allow(String),
 }
 
+impl fmt::Display for ResponseHeader {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let printable = match *self {
+            ResponseHeader::Allow(ref value) => format!("Allow: {}", value),
+        };
+        write!(f, "{}", printable)
+    }
+}
+
 #[derive(Debug)]
 pub enum Status {
     Ok,
@@ -359,8 +368,21 @@ mod tests {
 
     #[test]
     fn status_fmt() {
-        assert_that!(format!("{}", Status::Ok).as_str(), is(equal_to("200 OK")));
-        assert_that!(format!("{}", Status::NotFound).as_str(), is(equal_to("404 NOT FOUND")));
-        assert_that!(format!("{}", Status::MethodNotAllowed).as_str(), is(equal_to("405 METHOD NOT ALLOWED")));
+        assert_that!(
+            format!("{}", Status::Ok).as_str(),
+            is(equal_to("200 OK")));
+        assert_that!(
+            format!("{}", Status::NotFound).as_str(),
+            is(equal_to("404 NOT FOUND")));
+        assert_that!(
+            format!("{}", Status::MethodNotAllowed).as_str(),
+            is(equal_to("405 METHOD NOT ALLOWED")));
+    }
+
+    #[test]
+    fn response_header_fmt() {
+        assert_that!(
+            format!("{}", ResponseHeader::Allow(String::from("GET, POST, HEAD"))).as_str(),
+            is(equal_to("Allow: GET, POST, HEAD")));
     }
 }
