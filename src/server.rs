@@ -5,9 +5,7 @@ use std::fs::File;
 use Config;
 use threads::ThreadPool;
 use http;
-use http::Request;
-use http::Response;
-use http::Status;
+use http::*;
 
 pub mod defaults {
     pub const DEFAULT_ADDRESS: &str = "127.0.0.1";
@@ -119,9 +117,10 @@ fn handle_options_request(config: Config, request: Request) -> Response {
 }
 
 fn handle_unsupported_request() -> Response {
-    // FIXME Add Allow: header with allowed methods.
-    Response::new(
+    let mut response = Response::new(
         String::from("1.1"),
         Status::MethodNotAllowed,
-        String::from("Method not supported by this HTTP server implementation!"))
+        String::from("Method not supported by this HTTP server implementation!"));
+    response.add_header(ResponseHeader::Allow(String::from("GET, OPTIONS, HEAD")));
+    response
 }
