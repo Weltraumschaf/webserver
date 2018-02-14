@@ -3,6 +3,7 @@
 extern crate hamcrest;
 #[macro_use]
 extern crate log;
+extern crate time;
 
 mod file;
 mod http;

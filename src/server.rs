@@ -2,6 +2,7 @@ use std::io::prelude::*;
 use std::net::TcpListener;
 use std::net::TcpStream;
 use std::fs::File;
+use time;
 use Config;
 use file;
 use threads::ThreadPool;
@@ -110,9 +111,10 @@ fn handle_get_request(config: Config, request: Request) -> Response {
         response.add_header(ResponseHeader::ContentType(String::from("text/plain; charset=utf-8")));
         response
     };
-    
+
     let content_length = response.content_length();
     response.add_header(ResponseHeader::ContentLength(content_length));
+    response.add_header(ResponseHeader::Date(formatted_now()));
     response.add_header(ResponseHeader::Server(String::from("Weltraumschaf's Webserver")));
     response.add_header(ResponseHeader::AcceptRanges(String::from("none")));
     response
@@ -162,6 +164,12 @@ fn extract_file_extension(file_name: &String) -> String {
     }
 }
 
+fn formatted_now() -> String {
+    // http://man7.org/linux/man-pages/man3/strftime.3.html
+    // Wed, 14 Feb 2018 12:17:24 GMT
+    time::strftime("%a, %d %b %Y %H:%M:%S %Z", &time::now())
+        .expect("Can't format date!")
+}
 #[cfg(test)]
 mod tests {
     use super::*;
