@@ -110,7 +110,9 @@ fn handle_get_request(config: Config, request: Request) -> Response {
         response.add_header(ResponseHeader::ContentType(String::from("text/plain; charset=utf-8")));
         response
     };
-
+    
+    let content_length = response.content_length();
+    response.add_header(ResponseHeader::ContentLength(content_length));
     response.add_header(ResponseHeader::Server(String::from("Weltraumschaf's Webserver")));
     response.add_header(ResponseHeader::AcceptRanges(String::from("none")));
     response
@@ -229,5 +231,4 @@ mod tests {
             is(equal_to(String::from("js")))
         );
     }
-
 }

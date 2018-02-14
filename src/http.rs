@@ -176,6 +176,10 @@ impl Response {
     pub fn add_header(&mut self, header: ResponseHeader) {
         self.headers.push(header);
     }
+
+    pub fn content_length(&self) -> usize {
+        self.body.len()
+    }
 }
 
 // https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
@@ -188,6 +192,9 @@ pub enum ResponseHeader {
     AcceptRanges(String),
     // Content-Type: text/html; charset=utf-8
     ContentType(String),
+    ContentLength(usize),
+    // Date: Wed, 14 Feb 2018 11:27:44 GMT
+    Date(String),
 }
 
 impl fmt::Display for ResponseHeader {
@@ -197,6 +204,8 @@ impl fmt::Display for ResponseHeader {
             ResponseHeader::Server(ref value) => format!("Server: {}", value),
             ResponseHeader::AcceptRanges(ref value) => format!("Accept-Ranges: {}", value),
             ResponseHeader::ContentType(ref value) => format!("Content-Type: {}", value),
+            ResponseHeader::ContentLength(ref value) => format!("Content-Length: {}", value),
+            ResponseHeader::Date(ref value) => format!("Date: {}", value),
         };
         write!(f, "{}", printable)
     }
