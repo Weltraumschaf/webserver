@@ -12,6 +12,9 @@ clap = "2.29.2"
 log = "0.4.1"
 simple_logger = "0.3.1"
 time = "0.1.39"
+toml = "0.4.2"
+serde_derive = "1.0.27"
+serde = "1.0.27"
 
 [dev-dependencies]
 hamcrest = "0.1.5"

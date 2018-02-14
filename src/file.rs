@@ -21,6 +21,15 @@ pub fn read_bytes(file_name: &String) -> Vec<u8> {
     buffer
 }
 
+pub fn read_string(file_name: &String) -> String {
+    debug!("Reading file {}.", file_name);
+    let mut file = File::open(file_name)
+        .expect("Can't open file {}!");
+    let mut buffer = String::new();
+    file.read_to_string(&mut buffer);
+    buffer
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -28,17 +37,27 @@ mod tests {
 
     #[test]
     fn test_exists() {
-        assert_that!(exists(&String::from("test_fixture.txt")), is(true));
+        assert_that!(exists(&String::from("test/hello.txt")), is(true));
         assert_that!(exists(&String::from("snafu")), is(false));
     }
 
     #[test]
     fn test_read_bytes() {
-        let content = read_bytes(&String::from("test_fixture.txt"));
+        let content = read_bytes(&String::from("test/hello.txt"));
 
         assert_that!(
             content,
             is(equal_to(vec!(72, 101, 108, 108, 111, 44, 32, 87, 111, 114, 108, 100, 33)))
+        );
+    }
+
+    #[test]
+    fn test_read_string() {
+        let content = read_string(&String::from("test/hello.txt"));
+
+        assert_that!(
+            content,
+            is(equal_to(String::from("Hello, World!")))
         );
     }
 }

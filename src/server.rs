@@ -1,7 +1,6 @@
 use std::io::prelude::*;
 use std::net::TcpListener;
 use std::net::TcpStream;
-use std::fs::File;
 use time;
 use Config;
 use file;
@@ -170,13 +169,13 @@ fn formatted_now() -> String {
     time::strftime("%a, %d %b %Y %H:%M:%S %Z", &time::now())
         .expect("Can't format date!")
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use hamcrest::prelude::*;
 
     #[test]
-    #[ignore]
     fn test_determine_content_type_from_file_name() {
         assert_that!(
             determine_content_type(&String::from("")),
