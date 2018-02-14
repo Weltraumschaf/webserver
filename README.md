@@ -24,7 +24,7 @@ And then invoke the binary with a path to a web root directory in the project ro
 
 ## Wanted features
 
-- configuration options for:
+- configuration options for (done)
     - IP to bind (done)
     - port to bind (done)
     - number of threads used in the pool (done)
@@ -47,10 +47,12 @@ And then invoke the binary with a path to a web root directory in the project ro
     - error responses for unsupported methods (done)
 - custom error pages
 - graceful shutdown on `ctrl + c`
-- basic header in the response (wip)
+- basic header in the response (done)
     - server (done)
     - accept-range/content-type w/ hard coded default (done)
-    - content-type w/ right type
+    - content-type w/ right type (done)
+    - date (done)
+    - content-length (done)
     
 [rust-book]:    https://doc.rust-lang.org/stable/book/second-edition/ch20-00-final-project-a-web-server.html
 [rust-lang]:    https://www.rust-lang.org/
