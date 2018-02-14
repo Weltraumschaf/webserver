@@ -3,6 +3,7 @@ use std::net::TcpListener;
 use std::net::TcpStream;
 use std::fs::File;
 use Config;
+use file;
 use threads::ThreadPool;
 use http;
 use http::*;
@@ -53,7 +54,7 @@ impl Server {
 
         let response = build_response(config, request);
 
-        stream.write(response.render().as_bytes())
+        stream.write(&response.render())
             .expect("Can't write to TCP stream!");
         stream.flush()
             .expect("Can't flush TCP stream!");
@@ -88,33 +89,28 @@ fn build_response(config: Config, request: Request) -> Response {
 fn handle_get_request(config: Config, request: Request) -> Response {
     // FIXME Do not allow directory traversal.
     // FIXME Handle dir (/) to look for index.html or index.html.
-    let filename = format!("{}/{}", config.dir(), request.url());
+    let file_name = format!("{}/{}", config.dir(), request.url());
+    debug!("Try to serve file {}.", file_name);
 
-    let mut response = match File::open(&filename) {
-        Ok(mut f) => {
-            let mut contents = String::new();
-            // FIXME Handle binary data.
-            f.read_to_string(&mut contents)
-                .expect("Can't read resource file!");
-            let mut response = Response::new(
-                String::from("1.1"),
-                Status::Ok,
-                contents);
-            response.add_header(
-                ResponseHeader::ContentType(
-                    format!("{}; charset=utf-8",
-                        determine_content_type(&filename))));
-            response
-        },
-        Err(_) => {
-            let mut response = Response::new(
-                String::from("1.1"),
-                Status::NotFound,
-                String::from("Not found!"));
-            response.add_header(ResponseHeader::ContentType(String::from("text/plain; charset=utf-8")));
-            response
-        }
+    let mut response = if file::exists(&file_name) {
+        let mut contents = file::read_bytes(&file_name);
+        let mut response = Response::new(
+            String::from("1.1"),
+            Status::Ok,
+            contents);
+        response.add_header(
+            ResponseHeader::ContentType(
+                format!("{}; charset=utf-8", determine_content_type(&file_name))));
+        response
+    } else {
+        let mut response = Response::new(
+            String::from("1.1"),
+            Status::NotFound,
+            "Not found!".as_bytes().to_vec());
+        response.add_header(ResponseHeader::ContentType(String::from("text/plain; charset=utf-8")));
+        response
     };
+
     response.add_header(ResponseHeader::Server(String::from("Weltraumschaf's Webserver")));
     response.add_header(ResponseHeader::AcceptRanges(String::from("none")));
     response
@@ -125,7 +121,7 @@ fn handle_head_request(config: Config, request: Request) -> Response {
     let response = Response::new(
         String::from("1.1"),
         Status::NotImplemented,
-        String::from("Method not implemented yet!"));
+        "Method not implemented yet!".as_bytes().to_vec());
     response
 }
 
@@ -134,7 +130,7 @@ fn handle_options_request(config: Config, request: Request) -> Response {
     let response = Response::new(
         String::from("1.1"),
         Status::NotImplemented,
-        String::from("Method not implemented yet!"));
+        "Method not implemented yet!".as_bytes().to_vec());
     response
 }
 
@@ -142,7 +138,7 @@ fn handle_unsupported_request() -> Response {
     let mut response = Response::new(
         String::from("1.1"),
         Status::MethodNotAllowed,
-        String::from("Method not supported by this HTTP server implementation!"));
+        "Method not supported by this HTTP server implementation!".as_bytes().to_vec());
     response.add_header(ResponseHeader::Allow(String::from("GET, OPTIONS, HEAD")));
     response
 }
@@ -153,7 +149,7 @@ fn determine_content_type(file_name: &String) -> String {
         "css" => String::from("text/css"),
         "js" => String::from("text/javascript"),
         "ico" => String::from("image/x-icon"),
-        _ => String::from("text/plain") ,
+        _ => String::from("text/plain"),
     }
 }
 
@@ -233,4 +229,5 @@ mod tests {
             is(equal_to(String::from("js")))
         );
     }
+
 }

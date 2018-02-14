@@ -4,6 +4,7 @@ extern crate hamcrest;
 #[macro_use]
 extern crate log;
 
+mod file;
 mod http;
 mod threads;
 pub mod server;

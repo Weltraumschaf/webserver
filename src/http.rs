@@ -139,24 +139,37 @@ pub struct Response {
     version: String,
     status: Status,
     headers: Vec<ResponseHeader>,
-    body: String,
+    body: Vec<u8>,
 }
 
 impl Response {
-    pub fn new(version: String, status: Status, body: String) -> Response {
+    pub fn new(version: String, status: Status, body: Vec<u8>) -> Response {
         Response { version, status, headers: Vec::new(), body }
     }
 
-    pub fn render(&self) -> String {
-        let mut buffer = String::new();
-        buffer.push_str(format!("HTTP/{} {}\r\n", self.version, self.status).as_str());
+    pub fn render(&self) -> Vec<u8> {
+        let mut buffer: Vec<u8> = Vec::new();
+        let first_line = format!("HTTP/{} {}\r\n", self.version, self.status);
 
-        for header in self.headers.iter() {
-            buffer.push_str(format!("{}\r\n", header).as_str());
+        for byte in first_line.as_bytes() {
+            buffer.push(*byte);
         }
 
-        buffer.push_str("\r\n");
-        buffer.push_str(self.body.as_str());
+        for header in self.headers.iter() {
+            let header = format!("{}\r\n", header);
+
+            for byte in header.as_bytes() {
+                buffer.push(*byte);
+            }
+        }
+
+        buffer.push('\r' as u8);
+        buffer.push('\n' as u8);
+
+        for byte in &self.body {
+            buffer.push(*byte);
+        }
+
         buffer
     }
 
@@ -479,13 +492,13 @@ mod tests {
         let sut = Response::new(
             String::from("1.1"),
             Status::Ok,
-            String::from("Hello, World!")
+            "Hello, World!".as_bytes().to_vec()
         );
 
         assert_that!(
             sut.render(),
             is(equal_to(
-                String::from("HTTP/1.1 200 OK\r\n\r\nHello, World!")
+                "HTTP/1.1 200 OK\r\n\r\nHello, World!".as_bytes().to_vec()
             ))
         );
     }
@@ -495,7 +508,7 @@ mod tests {
         let mut sut = Response::new(
             String::from("1.1"),
             Status::MethodNotAllowed,
-            String::from("This is not allowed!")
+            "This is not allowed!".as_bytes().to_vec()
         );
 
         sut.add_header(ResponseHeader::Allow(String::from("GET, POST, HEAD")));
@@ -503,7 +516,7 @@ mod tests {
         assert_that!(
             sut.render(),
             is(equal_to(
-                String::from("HTTP/1.1 405 METHOD NOT ALLOWED\r\nAllow: GET, POST, HEAD\r\n\r\nThis is not allowed!")
+                "HTTP/1.1 405 METHOD NOT ALLOWED\r\nAllow: GET, POST, HEAD\r\n\r\nThis is not allowed!".as_bytes().to_vec()
             ))
         );
     }
