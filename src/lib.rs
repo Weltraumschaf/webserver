@@ -23,7 +23,7 @@ pub struct Config {
 }
 
 impl Config {
-    fn from_file(file_name: &String) -> Config {
+    pub fn from_file(file_name: &String) -> Config {
         let config = file::read_string(&file_name);
         toml::from_str(config.as_ref())
             .expect(format!("Can't parse config {}!", file_name).as_ref())

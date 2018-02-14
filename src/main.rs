@@ -6,74 +6,35 @@ extern crate clap;
 
 use clap::{Arg, App};
 use webserver::Config;
-use webserver::server::defaults::*;
 use webserver::server::Server;
 
 fn main() {
     simple_logger::init().unwrap();
-    info!("Starting web server ...");
 
-    let matches = App::new("Minimalistic HTTP Server")
+    let matches = App::new("Weltraumschaf's Webserver")
         .version("1.0.0")
         .author("Sven Strittmatter <ich@weltraumschaf.de>")
         .about("A minimalistic HTTP server.")
-        .arg(Arg::with_name("address")
-            .short("a")
-            .long("address")
+        .arg(Arg::with_name("config")
+            .short("c")
+            .long("config")
             .takes_value(true)
-            .help(format!(
-                "The IP address to bind to. Default is {}.",
-                DEFAULT_ADDRESS).as_str()))
-        .arg(Arg::with_name("port")
-            .short("p")
-            .long("port")
-            .takes_value(true)
-            .help(format!(
-                "The port to bind to. Default is {}.",
-                DEFAULT_PORT).as_str()))
-        .arg(Arg::with_name("threads")
-            .short("t")
-            .long("threads")
-            .takes_value(true)
-            .help(format!(
-                "Number of parallel threads used to serve. Default is {}",
-                DEFAULT_NUMBER_OF_THREADS).as_str()))
-        .arg(Arg::with_name("dir")
-            .short("d")
-            .long("dir")
-            .takes_value(true)
-            .required(true)
-            .help("The directory with the files to serve."))
+            .help("Location of configuration file in TOML format.")
+            .required(true))
         .get_matches();
 
-    let address = matches.value_of("address")
-        .unwrap_or(DEFAULT_ADDRESS);
-    let port = matches.value_of("port")
-        .unwrap_or(DEFAULT_PORT)
-        .parse::<u16>()
-        .unwrap();
+    let config_file = matches.value_of("config").unwrap();
+    let config = Config::from_file(&config_file.to_string());
 
-    if port < 1 {
+    if *config.port() < 1 {
         panic!("Port must be grater than 0!");
     }
 
-    let number_of_threads = matches.value_of("threads")
-        .unwrap_or(DEFAULT_NUMBER_OF_THREADS)
-        .parse::<usize>()
-        .unwrap();
-
-    if number_of_threads < 1 {
+    if *config.threads() < 1 {
         panic!("Number of threads must be grater than 0!");
     }
 
-    let dir = matches.value_of("dir").unwrap();
-
-    let config = Config::new(
-        address.to_string(),
-        port,
-        number_of_threads,
-        dir.to_string());
-
+    info!("Starting web server ...");
     let server = Server::new(config);
     server.bind();
 }
