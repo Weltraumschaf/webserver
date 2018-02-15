@@ -20,7 +20,9 @@ pub fn read_string(file_name: &PathBuf) -> String {
     let mut file = File::open(file_name)
         .expect("Can't open file {}!");
     let mut buffer = String::new();
-    file.read_to_string(&mut buffer);
+    file.read_to_string(&mut buffer).unwrap_or_else(|err| {
+        panic!("Can't read file: {}", err);
+    });
     buffer
 }
 
@@ -28,12 +30,6 @@ pub fn read_string(file_name: &PathBuf) -> String {
 mod tests {
     use super::*;
     use hamcrest::prelude::*;
-
-    #[test]
-    fn test_exists() {
-        assert_that!(exists(&String::from("test/hello.txt")), is(true));
-        assert_that!(exists(&String::from("snafu")), is(false));
-    }
 
     #[test]
     fn test_read_bytes() {
