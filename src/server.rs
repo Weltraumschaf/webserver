@@ -1,4 +1,5 @@
 use std::io::prelude::*;
+use std::path::{Path, PathBuf};
 use std::net::TcpListener;
 use std::net::TcpStream;
 use time;
@@ -83,8 +84,11 @@ fn build_response(config: Config, request: Request) -> Response {
 fn handle_get_request(config: Config, request: Request) -> Response {
     // FIXME Do not allow directory traversal.
     // FIXME Handle dir (/) to look for index.html or index.html.
+    let wanted_resource = create_resource_path(config.dir(), request.url());
+    debug!("Requested resource {:?}", wanted_resource);
+
     let file_name = format!("{}/{}", config.dir(), request.url());
-    debug!("Try to serve file {}.", file_name);
+    //debug!("Try to serve file {}.", file_name);
 
     let mut response = if file::exists(&file_name) {
         let mut contents = file::read_bytes(&file_name);
@@ -164,6 +168,19 @@ fn formatted_now() -> String {
         .expect("Can't format date!")
 }
 
+fn create_resource_path(web_root: &String, resource_url: &String) -> PathBuf {
+    let relative_resource_url = relativize_uri(resource_url);
+    Path::new(web_root).join(relative_resource_url)
+}
+
+fn relativize_uri(resource_url: &String) -> String {
+    if resource_url.starts_with("/") {
+        resource_url[1..].to_string()
+    } else {
+        resource_url.clone()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -231,5 +248,26 @@ mod tests {
             extract_file_extension(&String::from("/foo/bar/new.index.js")),
             is(equal_to(String::from("js")))
         );
+    }
+
+    #[test]
+    fn test_relativize_uri() {
+        assert_that!(relativize_uri(&String::from("foo/bar/bax.html")),
+            is(equal_to(String::from("foo/bar/bax.html"))));
+        assert_that!(relativize_uri(&String::from("/foo/bar/bax.html")),
+            is(equal_to(String::from("foo/bar/bax.html"))));
+    }
+
+    #[test]
+    fn test_create_resource_path() {
+        assert_that!(
+            create_resource_path(&String::from("web_root/"), &String::from("/")),
+            is(equal_to(PathBuf::from("web_root/"))));
+        assert_that!(
+            create_resource_path(&String::from("web_root/"), &String::from("/index.html")),
+            is(equal_to(PathBuf::from("web_root/index.html"))));
+        assert_that!(
+            create_resource_path(&String::from("web_root/"), &String::from("/css/main.css")),
+            is(equal_to(PathBuf::from("web_root/css/main.css"))));
     }
 }

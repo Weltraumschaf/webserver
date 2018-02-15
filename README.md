@@ -29,13 +29,13 @@ And then invoke the binary with a path to a web root directory in the project ro
     - port to bind (done)
     - number of threads used in the pool (done)
     - directory where to find files to server (done)
-- file based configuration
-    - YAML based
+- file based configuration (wip)
+    - TOML based (done)
     - values for 
-        - IP
-        - port
-        - threads
-        - web root
+        - IP  (done)
+        - port  (done)
+        - threads  (done)
+        - web root  (done)
         - error doc root
         - log file path
         - host name
