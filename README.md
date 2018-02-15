@@ -38,13 +38,12 @@ And then invoke the binary with a path to a web root directory in the project ro
         - web root  (done)
         - error doc root
         - log file path
-        - host name
 - logging to file
-- HTTP methods (wip)
+- HTTP methods (done)
     - GET requests (done)
         - serve `index.html`/`index.htm` if directory requested (done)
     - HEAD requests (done)
-    - OPTIONS request
+    - OPTIONS request (done)
     - error responses for unsupported methods (done)
 - custom error pages
 - graceful shutdown on `ctrl + c`

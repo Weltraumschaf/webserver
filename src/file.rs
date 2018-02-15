@@ -2,13 +2,6 @@ use std::io::prelude::*;
 use std::fs::File;
 use std::path::PathBuf;
 
-pub fn exists(file_name: &String) -> bool {
-    match File::open(file_name) {
-        Ok(_) => true,
-        Err(_) => false,
-    }
-}
-
 pub fn read_bytes(file_name: &PathBuf) -> Vec<u8> {
     debug!("Reading file {:?}.", file_name);
     let file = File::open(file_name)

@@ -216,9 +216,6 @@ pub enum Status {
     // Client errors 400 - 499
     NotFound,
     MethodNotAllowed,
-    // Server errors 500 - 599
-    InternalServerError,
-    NotImplemented,
 }
 
 impl fmt::Display for Status {
@@ -227,8 +224,6 @@ impl fmt::Display for Status {
             Status::Ok => "200 OK",
             Status::NotFound => "404 NOT FOUND",
             Status::MethodNotAllowed => "405 METHOD NOT ALLOWED",
-            Status::InternalServerError => "500 INTERNAL SERVER ERROR",
-            Status::NotImplemented => "501 NOT IMPLEMENTED",
         };
         write!(f, "{}", printable)
     }

@@ -83,7 +83,7 @@ fn build_response(config: Config, request: Request) -> Response {
     match request.method().as_ref() {
         "GET" => handle_get_request(config, request),
         "HEAD" => handle_head_request(config, request),
-        "OPTIONS" => handle_options_request(config, request),
+        "OPTIONS" => handle_options_request(),
         _ => handle_unsupported_request(),
     }
 }
@@ -132,7 +132,7 @@ fn handle_head_request(config: Config, request: Request) -> Response {
     response
 }
 
-fn handle_options_request(config: Config, request: Request) -> Response {
+fn handle_options_request() -> Response {
     let mut response = Response::new(
         http::VERSION.to_string(),
         Status::Ok,
