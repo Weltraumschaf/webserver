@@ -6,6 +6,7 @@ extern crate clap;
 
 use std::process;
 use clap::{Arg, App};
+use std::path::{PathBuf};
 use webserver::Config;
 use webserver::server::Server;
 
@@ -25,9 +26,10 @@ fn main() {
         .get_matches();
 
     let config_file = matches.value_of("config").expect("No config file given!");
+    let config_file = PathBuf::from(config_file);
 
-    let config = Config::from_file(&config_file.to_string()).unwrap_or_else(|err| {
-        println!("Problem reading config file {}: {}", config_file, err);
+    let config = Config::from_file(&config_file).unwrap_or_else(|err| {
+        println!("Problem reading config file {:?}: {}", config_file, err);
         process::exit(1);
     });
 

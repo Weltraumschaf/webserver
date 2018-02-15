@@ -9,6 +9,8 @@ extern crate serde_derive;
 extern crate serde;
 extern crate toml;
 
+use std::path::PathBuf;
+
 mod file;
 mod http;
 mod threads;
@@ -23,7 +25,7 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn from_file(file_name: &String) -> Result<Config, &'static str> {
+    pub fn from_file(file_name: &PathBuf) -> Result<Config, &'static str> {
         let config = file::read_string(&file_name);
 
         match toml::from_str::<Config>(config.as_ref()) {
@@ -76,7 +78,7 @@ mod tests {
 
     #[test]
     fn read_config_from_from_file() {
-        let config = Config::from_file(&String::from("test/config.toml"))
+        let config = Config::from_file(&PathBuf::from("test/config.toml"))
             .expect("Can't read config fixture file!");
 
         assert_eq!(config.address(), "127.0.0.1");

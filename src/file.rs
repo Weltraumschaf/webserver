@@ -22,8 +22,8 @@ pub fn read_bytes(file_name: &PathBuf) -> Vec<u8> {
     buffer
 }
 
-pub fn read_string(file_name: &String) -> String {
-    debug!("Reading file {}.", file_name);
+pub fn read_string(file_name: &PathBuf) -> String {
+    debug!("Reading file {:?}.", file_name);
     let mut file = File::open(file_name)
         .expect("Can't open file {}!");
     let mut buffer = String::new();
@@ -54,7 +54,7 @@ mod tests {
 
     #[test]
     fn test_read_string() {
-        let content = read_string(&String::from("test/hello.txt"));
+        let content = read_string(&PathBuf::from("test/hello.txt"));
 
         assert_that!(
             content,
