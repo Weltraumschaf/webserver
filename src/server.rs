@@ -7,7 +7,7 @@ use Config;
 use file;
 use threads::ThreadPool;
 use http;
-use http::*;
+use http::{Request, Response, ResponseHeader, Status};
 
 pub struct Server {
     config: Config,
@@ -18,14 +18,19 @@ impl Server {
         Server { config }
     }
 
-    pub fn bind(&self) {
+    pub fn bind(&self) -> Result<(), &'static str> {
         let addr = format!("{}:{}", self.config.address, self.config.port);
         info!("Bind to {}", addr);
-        let listener = TcpListener::bind(addr.clone())
-            .expect(format!("Can't bind TCP listener on address {}!", addr).as_str());
+
+        let listener = if let Ok(listener) = TcpListener::bind(addr.clone()) {
+            listener
+        } else {
+            return Err("Can't bind TCP listener on address!");
+        };
 
         info!("Serving with {} threads.", self.config.threads);
         let pool = ThreadPool::new(self.config.threads);
+        format!("Listening on http://{}:{}/", self.config.address, self.config.port);
 
         for stream in listener.incoming() {
             let stream = stream.expect("Cn't open TCP stream!");
@@ -35,6 +40,8 @@ impl Server {
                 Server::handle_connection_new(stream, config);
             });
         }
+
+        Ok(())
     }
 
     fn handle_connection_new(mut stream: TcpStream, config: Config) {
