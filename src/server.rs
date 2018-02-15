@@ -133,11 +133,12 @@ fn handle_head_request(config: Config, request: Request) -> Response {
 }
 
 fn handle_options_request(config: Config, request: Request) -> Response {
-    // TODO Implement it.
-    let response = Response::new(
-        String::from("1.1"),
-        Status::NotImplemented,
-        "Method not implemented yet!".as_bytes().to_vec());
+    let mut response = Response::new(
+        http::VERSION.to_string(),
+        Status::Ok,
+        Vec::new());
+    add_default_headers(&mut response);
+    response.add_header(ResponseHeader::Allow(http::ALLOWED_METHODS.to_string()));
     response
 }
 
@@ -146,7 +147,7 @@ fn handle_unsupported_request() -> Response {
         String::from("1.1"),
         Status::MethodNotAllowed,
         "Method not supported by this HTTP server implementation!".as_bytes().to_vec());
-    response.add_header(ResponseHeader::Allow(String::from("GET, OPTIONS, HEAD")));
+    response.add_header(ResponseHeader::Allow(http::ALLOWED_METHODS.to_string()));
     response
 }
 

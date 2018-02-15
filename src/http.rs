@@ -1,6 +1,7 @@
 use std::fmt;
 
 pub static VERSION: &'static str = "1.1";
+pub static ALLOWED_METHODS: &'static str = "GET, POST, HEAD";
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Request {
