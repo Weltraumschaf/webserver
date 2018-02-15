@@ -93,19 +93,9 @@ fn handle_get_request(config: Config, request: Request) -> Response {
     debug!("Wanted resource is {:?}", wanted_resource);
 
     if wanted_resource.is_dir() {
-        let mut wanted_resource_file = wanted_resource.join("index.html");
-        debug!("Wanted resource is a directory. Looking for {:?}", wanted_resource_file);
-
-        if !wanted_resource_file.exists() {
-            wanted_resource_file = wanted_resource.join("index.htm");
-            debug!("Wanted resource is a directory. Looking for {:?}", wanted_resource_file);
-        }
-
-        if !wanted_resource_file.exists() {
-            debug!("Nothing appropriate found!");
-            return not_found_response();
-        } else {
-            wanted_resource = wanted_resource_file;
+        match handle_directory_resource(wanted_resource) {
+            Some(resource) => wanted_resource = resource,
+            None => return not_found_response(),
         }
     }
 
@@ -132,6 +122,23 @@ fn handle_get_request(config: Config, request: Request) -> Response {
     response.add_header(ResponseHeader::Server(String::from("Weltraumschaf's Webserver")));
     response.add_header(ResponseHeader::AcceptRanges(String::from("none")));
     response
+}
+
+fn handle_directory_resource(wanted_resource: PathBuf) -> Option<PathBuf> {
+    let mut wanted_resource_file = wanted_resource.join("index.html");
+    debug!("Wanted resource is a directory. Looking for {:?}", wanted_resource_file);
+
+    if !wanted_resource_file.exists() {
+        wanted_resource_file = wanted_resource.join("index.htm");
+        debug!("Wanted resource is a directory. Looking for {:?}", wanted_resource_file);
+    }
+
+    if !wanted_resource_file.exists() {
+        debug!("Nothing appropriate found!");
+        None
+    } else {
+        Some(wanted_resource_file)
+    }
 }
 
 fn not_found_response() -> Response {
