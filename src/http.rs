@@ -348,7 +348,7 @@ mod tests {
     fn test_split_lines() {
         let request_fixture = "GET /foo HTTP/1.1\r\nHost: localhost:8080\r\nUser-Agent: curl/7.54.0\r\nAccept: */*\r\n";
 
-        assert_that(
+        assert_that!(
             split_lines(request_fixture),
             is(equal_to(
                 vec!(

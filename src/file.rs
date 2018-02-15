@@ -1,5 +1,6 @@
 use std::io::prelude::*;
 use std::fs::File;
+use std::path::PathBuf;
 
 pub fn exists(file_name: &String) -> bool {
     match File::open(file_name) {
@@ -8,8 +9,8 @@ pub fn exists(file_name: &String) -> bool {
     }
 }
 
-pub fn read_bytes(file_name: &String) -> Vec<u8> {
-    debug!("Reading file {}.", file_name);
+pub fn read_bytes(file_name: &PathBuf) -> Vec<u8> {
+    debug!("Reading file {:?}.", file_name);
     let file = File::open(file_name)
         .expect("Can't open file {}!");
     let mut buffer: Vec<u8> = Vec::new();
@@ -43,7 +44,7 @@ mod tests {
 
     #[test]
     fn test_read_bytes() {
-        let content = read_bytes(&String::from("test/hello.txt"));
+        let content = read_bytes(&PathBuf::from("test/hello.txt"));
 
         assert_that!(
             content,

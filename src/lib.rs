@@ -73,7 +73,6 @@ impl Config {
 mod tests {
     use super::*;
     use hamcrest::prelude::*;
-    use file;
 
     #[test]
     fn read_config_from_from_file() {

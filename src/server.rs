@@ -90,30 +90,40 @@ fn build_response(config: Config, request: Request) -> Response {
 
 fn handle_get_request(config: Config, request: Request) -> Response {
     // FIXME Do not allow directory traversal.
-    // FIXME Handle dir (/) to look for index.html or index.html.
-    let wanted_resource = create_resource_path(config.dir(), request.url());
+    let mut wanted_resource = create_resource_path(config.dir(), request.url());
+    debug!("Wanted resource is {:?}", wanted_resource);
+
+    if wanted_resource.is_dir() {
+        let mut wanted_resource_file = wanted_resource.join("index.html");
+        debug!("Wanted resource is a directory. Looking for {:?}", wanted_resource_file);
+
+        if !wanted_resource_file.exists() {
+            wanted_resource_file = wanted_resource.join("index.htm");
+            debug!("Wanted resource is a directory. Looking for {:?}", wanted_resource_file);
+        }
+
+        if !wanted_resource_file.exists() {
+            debug!("Nothing appropriate found!");
+            return not_found_response();
+        } else {
+            wanted_resource = wanted_resource_file;
+        }
+    }
+
     debug!("Requested resource {:?}", wanted_resource);
 
-    let file_name = format!("{}/{}", config.dir(), request.url());
-    //debug!("Try to serve file {}.", file_name);
-
-    let mut response = if file::exists(&file_name) {
-        let mut contents = file::read_bytes(&file_name);
+    let mut response = if wanted_resource.exists() {
+        let mut contents = file::read_bytes(&wanted_resource);
         let mut response = Response::new(
             String::from("1.1"),
             Status::Ok,
             contents);
         response.add_header(
             ResponseHeader::ContentType(
-                format!("{}; charset=utf-8", determine_content_type(&file_name))));
+                format!("{}; charset=utf-8", determine_content_type(&wanted_resource))));
         response
     } else {
-        let mut response = Response::new(
-            String::from("1.1"),
-            Status::NotFound,
-            "Not found!".as_bytes().to_vec());
-        response.add_header(ResponseHeader::ContentType(String::from("text/plain; charset=utf-8")));
-        response
+        not_found_response()
     };
 
     let content_length = response.content_length();
@@ -121,6 +131,15 @@ fn handle_get_request(config: Config, request: Request) -> Response {
     response.add_header(ResponseHeader::Date(formatted_now()));
     response.add_header(ResponseHeader::Server(String::from("Weltraumschaf's Webserver")));
     response.add_header(ResponseHeader::AcceptRanges(String::from("none")));
+    response
+}
+
+fn not_found_response() -> Response {
+    let mut response = Response::new(
+        String::from("1.1"),
+        Status::NotFound,
+        "Not found!".as_bytes().to_vec());
+    response.add_header(ResponseHeader::ContentType(String::from("text/plain; charset=utf-8")));
     response
 }
 
@@ -151,20 +170,18 @@ fn handle_unsupported_request() -> Response {
     response
 }
 
-fn determine_content_type(file_name: &String) -> String {
-    match extract_file_extension(&file_name).as_ref() {
-        "html" | "htm" => String::from("text/html"),
-        "css" => String::from("text/css"),
-        "js" => String::from("text/javascript"),
-        "ico" => String::from("image/x-icon"),
-        _ => String::from("text/plain"),
-    }
-}
-
-fn extract_file_extension(file_name: &String) -> String {
-    match file_name.rfind(".") {
-        Some(pos) => file_name[pos + 1..].to_string(),
-        None => String::from(""),
+fn determine_content_type(file_name: &PathBuf) -> String {
+    match file_name.extension() {
+        Some(extension) => {
+            match extension.to_str().unwrap() {
+                "html" | "htm" => String::from("text/html"),
+                "css" => String::from("text/css"),
+                "js" => String::from("text/javascript"),
+                "ico" => String::from("image/x-icon"),
+                _ => String::from("text/plain"),
+            }
+        },
+        None => String::from("text/plain"),
     }
 }
 
@@ -196,85 +213,57 @@ mod tests {
     #[test]
     fn test_determine_content_type_from_file_name() {
         assert_that!(
-            determine_content_type(&String::from("")),
+            determine_content_type(&PathBuf::from("")),
             is(equal_to(String::from("text/plain")))
         );
         assert_that!(
-            determine_content_type(&String::from("index.html")),
+            determine_content_type(&PathBuf::from("index.html")),
             is(equal_to(String::from("text/html")))
         );
         assert_that!(
-            determine_content_type(&String::from("new.index.htm")),
+            determine_content_type(&PathBuf::from("new.index.htm")),
             is(equal_to(String::from("text/html")))
         );
         assert_that!(
-            determine_content_type(&String::from("/foo/bar/new.index.html")),
+            determine_content_type(&PathBuf::from("/foo/bar/new.index.html")),
             is(equal_to(String::from("text/html")))
         );
         assert_that!(
-            determine_content_type(&String::from("foo.abr.css")),
+            determine_content_type(&PathBuf::from("foo.abr.css")),
             is(equal_to(String::from("text/css")))
         );
         assert_that!(
-            determine_content_type(&String::from("/foo/bar/new.index.js")),
+            determine_content_type(&PathBuf::from("/foo/bar/new.index.js")),
             is(equal_to(String::from("text/javascript")))
         );
         assert_that!(
-            determine_content_type(&String::from("/foo/bar/new.index.js")),
+            determine_content_type(&PathBuf::from("/foo/bar/new.index.js")),
             is(equal_to(String::from("text/javascript")))
         );
         assert_that!(
-            determine_content_type(&String::from("/foo/bar/favicon.ico")),
+            determine_content_type(&PathBuf::from("/foo/bar/favicon.ico")),
             is(equal_to(String::from("image/x-icon")))
         );
     }
 
     #[test]
-    fn test_extract_file_extension() {
-        assert_that!(
-            extract_file_extension(&String::from("")),
-            is(equal_to(String::from("")))
-        );
-        assert_that!(
-            extract_file_extension(&String::from("index.html")),
-            is(equal_to(String::from("html")))
-        );
-        assert_that!(
-            extract_file_extension(&String::from("new.index.htm")),
-            is(equal_to(String::from("htm")))
-        );
-        assert_that!(
-            extract_file_extension(&String::from("/foo/bar/new.index.html")),
-            is(equal_to(String::from("html")))
-        );
-        assert_that!(
-            extract_file_extension(&String::from("foo.abr.css")),
-            is(equal_to(String::from("css")))
-        );
-        assert_that!(
-            extract_file_extension(&String::from("/foo/bar/new.index.js")),
-            is(equal_to(String::from("js")))
-        );
-    }
-
-    #[test]
     fn test_relativize_uri() {
-        assert_that!(relativize_uri(&String::from("foo/bar/bax.html")),
+        assert_that!(relativize_uri( & String::from("foo/bar/bax.html")),
             is(equal_to(String::from("foo/bar/bax.html"))));
-        assert_that!(relativize_uri(&String::from("/foo/bar/bax.html")),
+        assert_that!(relativize_uri( & String::from("/foo/bar/bax.html")),
             is(equal_to(String::from("foo/bar/bax.html"))));
     }
 
     #[test]
     fn test_create_resource_path() {
         assert_that!(
-            create_resource_path(&String::from("web_root/"), &String::from("/")),
+            create_resource_path( & String::from("web_root/"), & String::from("/")),
             is(equal_to(PathBuf::from("web_root/"))));
         assert_that!(
-            create_resource_path(&String::from("web_root/"), &String::from("/index.html")),
+            create_resource_path( & String::from("web_root/"), &String::from("/index.html")),
             is(equal_to(PathBuf::from("web_root/index.html"))));
         assert_that!(
-            create_resource_path(&String::from("web_root/"), &String::from("/css/main.css")),
+            create_resource_path( & String::from("web_root/"), & String::from("/css/main.css")),
             is(equal_to(PathBuf::from("web_root/css/main.css"))));
     }
 }
