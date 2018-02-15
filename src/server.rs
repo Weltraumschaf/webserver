@@ -89,7 +89,6 @@ fn build_response(config: Config, request: Request) -> Response {
 }
 
 fn handle_get_request(config: Config, request: Request) -> Response {
-    // FIXME Do not allow directory traversal.
     let mut wanted_resource = create_resource_path(config.dir(), request.url());
     debug!("Wanted resource is {:?}", wanted_resource);
 
@@ -110,7 +109,7 @@ fn handle_get_request(config: Config, request: Request) -> Response {
         }
     }
 
-    debug!("Requested resource {:?}", wanted_resource);
+    debug!("Found resource {:?}", wanted_resource);
 
     let mut response = if wanted_resource.exists() {
         let mut contents = file::read_bytes(&wanted_resource);
@@ -123,6 +122,7 @@ fn handle_get_request(config: Config, request: Request) -> Response {
                 format!("{}; charset=utf-8", determine_content_type(&wanted_resource))));
         response
     } else {
+        debug!("Not found {:?}", wanted_resource);
         not_found_response()
     };
 
