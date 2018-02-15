@@ -43,7 +43,7 @@ And then invoke the binary with a path to a web root directory in the project ro
 - HTTP methods (wip)
     - GET requests (done)
         - serve `index.html`/`index.htm` if directory requested (done)
-    - HEAD requests
+    - HEAD requests (done)
     - OPTIONS request
     - error responses for unsupported methods (done)
 - custom error pages

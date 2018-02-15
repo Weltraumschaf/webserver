@@ -1,5 +1,7 @@
 use std::fmt;
 
+pub static VERSION: &'static str = "1.1";
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct Request {
     method: String,
@@ -175,10 +177,6 @@ impl Response {
 
     pub fn add_header(&mut self, header: ResponseHeader) {
         self.headers.push(header);
-    }
-
-    pub fn content_length(&self) -> usize {
-        self.body.len()
     }
 }
 

@@ -92,11 +92,13 @@ fn handle_get_request(config: Config, request: Request) -> Response {
     let mut response = match find_resource(config, request) {
         Some(resource) => {
             debug!("Found resource {:?}", resource);
-            let mut contents = file::read_bytes(&resource);
+            let mut content = file::read_bytes(&resource);
+            let content_length = content.len();
             let mut response = Response::new(
-                String::from("1.1"),
+                http::VERSION.to_string(),
                 Status::Ok,
-                contents);
+                content);
+            response.add_header(ResponseHeader::ContentLength(content_length));
             response.add_header(
                 ResponseHeader::ContentType(
                     format!("{}; charset=utf-8", determine_content_type(&resource))));
@@ -105,20 +107,28 @@ fn handle_get_request(config: Config, request: Request) -> Response {
         None => not_found_response(),
     };
 
-    let content_length = response.content_length();
-    response.add_header(ResponseHeader::ContentLength(content_length));
-    response.add_header(ResponseHeader::Date(formatted_now()));
-    response.add_header(ResponseHeader::Server(String::from("Weltraumschaf's Webserver")));
-    response.add_header(ResponseHeader::AcceptRanges(String::from("none")));
+    add_default_headers(&mut response);
     response
 }
 
 fn handle_head_request(config: Config, request: Request) -> Response {
-    // TODO Implement it.
-    let response = Response::new(
-        String::from("1.1"),
-        Status::NotImplemented,
-        "Method not implemented yet!".as_bytes().to_vec());
+    let mut response = match find_resource(config, request) {
+        Some(resource) => {
+            debug!("Found resource {:?}", resource);
+            let mut response = Response::new(
+                http::VERSION.to_string(),
+                Status::Ok,
+                Vec::new());
+            response.add_header(ResponseHeader::ContentLength(0));
+            response.add_header(
+                ResponseHeader::ContentType(
+                    format!("{}; charset=utf-8", determine_content_type(&resource))));
+            response
+        },
+        None => not_found_response(),
+    };
+
+    add_default_headers(&mut response);
     response
 }
 
@@ -195,6 +205,12 @@ fn determine_content_type(file_name: &PathBuf) -> String {
         },
         None => String::from("text/plain"),
     }
+}
+
+fn add_default_headers(response: &mut Response) {
+    response.add_header(ResponseHeader::Date(formatted_now()));
+    response.add_header(ResponseHeader::Server(String::from("Weltraumschaf's Webserver")));
+    response.add_header(ResponseHeader::AcceptRanges(String::from("none")));
 }
 
 fn formatted_now() -> String {
