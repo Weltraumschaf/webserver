@@ -89,31 +89,20 @@ fn build_response(config: Config, request: Request) -> Response {
 }
 
 fn handle_get_request(config: Config, request: Request) -> Response {
-    let mut wanted_resource = create_resource_path(config.dir(), request.url());
-    debug!("Wanted resource is {:?}", wanted_resource);
-
-    if wanted_resource.is_dir() {
-        match handle_directory_resource(wanted_resource) {
-            Some(resource) => wanted_resource = resource,
-            None => return not_found_response(),
-        }
-    }
-
-    debug!("Found resource {:?}", wanted_resource);
-
-    let mut response = if wanted_resource.exists() {
-        let mut contents = file::read_bytes(&wanted_resource);
-        let mut response = Response::new(
-            String::from("1.1"),
-            Status::Ok,
-            contents);
-        response.add_header(
-            ResponseHeader::ContentType(
-                format!("{}; charset=utf-8", determine_content_type(&wanted_resource))));
-        response
-    } else {
-        debug!("Not found {:?}", wanted_resource);
-        not_found_response()
+    let mut response = match find_resource(config, request) {
+        Some(resource) => {
+            debug!("Found resource {:?}", resource);
+            let mut contents = file::read_bytes(&resource);
+            let mut response = Response::new(
+                String::from("1.1"),
+                Status::Ok,
+                contents);
+            response.add_header(
+                ResponseHeader::ContentType(
+                    format!("{}; charset=utf-8", determine_content_type(&resource))));
+            response
+        },
+        None => not_found_response(),
     };
 
     let content_length = response.content_length();
@@ -121,32 +110,6 @@ fn handle_get_request(config: Config, request: Request) -> Response {
     response.add_header(ResponseHeader::Date(formatted_now()));
     response.add_header(ResponseHeader::Server(String::from("Weltraumschaf's Webserver")));
     response.add_header(ResponseHeader::AcceptRanges(String::from("none")));
-    response
-}
-
-fn handle_directory_resource(wanted_resource: PathBuf) -> Option<PathBuf> {
-    let mut wanted_resource_file = wanted_resource.join("index.html");
-    debug!("Wanted resource is a directory. Looking for {:?}", wanted_resource_file);
-
-    if !wanted_resource_file.exists() {
-        wanted_resource_file = wanted_resource.join("index.htm");
-        debug!("Wanted resource is a directory. Looking for {:?}", wanted_resource_file);
-    }
-
-    if !wanted_resource_file.exists() {
-        debug!("Nothing appropriate found!");
-        None
-    } else {
-        Some(wanted_resource_file)
-    }
-}
-
-fn not_found_response() -> Response {
-    let mut response = Response::new(
-        String::from("1.1"),
-        Status::NotFound,
-        "Not found!".as_bytes().to_vec());
-    response.add_header(ResponseHeader::ContentType(String::from("text/plain; charset=utf-8")));
     response
 }
 
@@ -174,6 +137,48 @@ fn handle_unsupported_request() -> Response {
         Status::MethodNotAllowed,
         "Method not supported by this HTTP server implementation!".as_bytes().to_vec());
     response.add_header(ResponseHeader::Allow(String::from("GET, OPTIONS, HEAD")));
+    response
+}
+
+fn find_resource(config: Config, request: Request) -> Option<PathBuf> {
+    let wanted_resource = create_resource_path(config.dir(), request.url());
+    debug!("Wanted resource is {:?}", wanted_resource);
+
+    if wanted_resource.is_dir() {
+        return handle_directory_resource(wanted_resource);
+    }
+
+    if wanted_resource.exists() {
+        Some(wanted_resource)
+    } else {
+        debug!("Not found {:?}", wanted_resource);
+        None
+    }
+}
+
+fn handle_directory_resource(wanted_resource: PathBuf) -> Option<PathBuf> {
+    let mut wanted_resource_file = wanted_resource.join("index.html");
+    debug!("Wanted resource is a directory. Looking for {:?}", wanted_resource_file);
+
+    if !wanted_resource_file.exists() {
+        wanted_resource_file = wanted_resource.join("index.htm");
+        debug!("Wanted resource is a directory. Looking for {:?}", wanted_resource_file);
+    }
+
+    if !wanted_resource_file.exists() {
+        debug!("Nothing appropriate found!");
+        None
+    } else {
+        Some(wanted_resource_file)
+    }
+}
+
+fn not_found_response() -> Response {
+    let mut response = Response::new(
+        String::from("1.1"),
+        Status::NotFound,
+        "Not found!".as_bytes().to_vec());
+    response.add_header(ResponseHeader::ContentType(String::from("text/plain; charset=utf-8")));
     response
 }
 
