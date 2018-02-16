@@ -1,7 +1,8 @@
 extern crate webserver;
+extern crate flexi_logger;
 #[macro_use]
 extern crate log;
-extern crate simple_logger;
+use flexi_logger::{Logger,opt_format};
 extern crate clap;
 
 use std::process;
@@ -11,7 +12,12 @@ use webserver::Config;
 use webserver::server::Server;
 
 fn main() {
-    simple_logger::init().unwrap();
+    Logger::with_str("warn, webserver=debug, webserver=debug")
+        .log_to_file()
+        .directory("log_files")
+        .format(opt_format)
+        .start()
+        .unwrap_or_else(|e|{panic!("Logger initialization failed with {}",e)});
 
     let matches = App::new("Weltraumschaf's Webserver")
         .version("1.0.0")

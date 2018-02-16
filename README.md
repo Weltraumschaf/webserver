@@ -37,7 +37,7 @@ And then invoke the binary with a path to a web root directory in the project ro
         - threads  (done)
         - web root  (done)
         - error doc root
-        - log file path
+        - log file path (wip)
 - logging to file
 - HTTP methods (done)
     - GET requests (done)
