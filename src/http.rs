@@ -1,12 +1,20 @@
 use std::fmt;
 
+///! This module provides abstractions to deal with HTTP requests and responses.
+///
+/// Used HTTP version.
 pub static VERSION: &'static str = "1.1";
+/// Allowed HTTP methods.
 pub static ALLOWED_METHODS: &'static str = "GET, POST, HEAD";
 
+/// Represents a HTTP request.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Request {
+    /// Requested HTTP method.
     method: String,
+    /// Request HTTP URL.
     url: String,
+    /// Version of HTTP the client speaks.
     version: String,
     host: String,
     user_agent: String,
@@ -21,10 +29,12 @@ pub struct Request {
 }
 
 impl Request {
+    /// Get the requested method.
     pub fn method(&self) -> &String {
         &self.method
     }
 
+    /// Get the requested URL.
     pub fn url(&self) -> &String {
         &self.url
     }
@@ -137,6 +147,7 @@ impl RequestBuilder {
     }
 }
 
+/// Represents a HTTP response.
 #[derive(Debug)]
 pub struct Response {
     version: String,
@@ -150,6 +161,7 @@ impl Response {
         Response { version, status, headers: Vec::new(), body }
     }
 
+    /// Renders the response into a byte vector to be written to  stream.
     pub fn render(&self) -> Vec<u8> {
         let mut buffer: Vec<u8> = Vec::new();
         let first_line = format!("HTTP/{} {}\r\n", self.version, self.status);
@@ -181,10 +193,10 @@ impl Response {
     }
 }
 
-// https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
+/// This enum declares some [HTTP response headers](https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html).
 #[derive(Debug)]
 pub enum ResponseHeader {
-    // Allow: GET, POST, HEAD
+    /// Allowed HTTP methods: `Allow: GET, POST, HEAD`.
     Allow(String),
     Server(String),
     // Accept-Ranges: none
@@ -210,11 +222,16 @@ impl fmt::Display for ResponseHeader {
     }
 }
 
+/// This enum declares some [HTTP stats codes](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes).
 #[derive(Debug)]
 pub enum Status {
+    // Success 200 - 299:
+    /// Standard response for successful HTTP requests.
     Ok,
-    // Client errors 400 - 499
+    // Client errors 400 - 499:
+    /// The requested resource could not be found.
     NotFound,
+    /// A request method is not supported for the requested resource.
     MethodNotAllowed,
 }
 
@@ -239,55 +256,7 @@ enum RequestToken {
     EndOfText,
 }
 
-fn split_lines(input: &str) -> Vec<&str> {
-    input.trim().split("\r\n").collect::<Vec<&str>>()
-}
-
-fn parse_first_line(line: &str) -> (RequestToken, RequestToken, RequestToken) {
-    let parts: Vec<&str> = line.split(" ").collect::<Vec<&str>>();
-    let method = parts[0].trim();
-    let url = parts[1].trim();
-    let full_version = parts[2].trim();
-    let version = &full_version[5..];
-
-    (RequestToken::Method(method.to_string()),
-        RequestToken::Url(url.to_string()),
-        RequestToken::Version(version.to_string()))
-}
-
-fn parse_non_first_line(line: &str) -> (RequestToken, RequestToken) {
-    let colon_position = line.find(":")
-        .expect("No colon found in line!");
-    let header_name = line[0..colon_position].trim();
-    let header_value = line[colon_position + 1..].trim();
-
-    (RequestToken::HeaderName(header_name.to_string()),
-        RequestToken::HeaderValue(header_value.to_string()))
-}
-
-fn scan_request(request: &str) -> Vec<RequestToken> {
-    let lines = split_lines(request);
-    let mut tokens: Vec<RequestToken> = Vec::new();
-    let mut is_first_line = true;
-
-    for line in lines {
-        if is_first_line {
-            let (method, uri, version) = parse_first_line(line);
-            tokens.push(method);
-            tokens.push(uri);
-            tokens.push(version);
-            is_first_line = false;
-        } else {
-            let (name, value) = parse_non_first_line(line);
-            tokens.push(name);
-            tokens.push(value);
-        }
-    };
-
-    tokens.push(RequestToken::EndOfText);
-    tokens
-}
-
+/// Parses a HTTP request from string into a request object.
 pub fn parse_request(request: &str) -> Request {
     if request.is_empty() {
         panic!("Empty request input!");
@@ -331,6 +300,55 @@ pub fn parse_request(request: &str) -> Request {
     }
 
     builder.create()
+}
+
+fn scan_request(request: &str) -> Vec<RequestToken> {
+    let lines = split_lines(request);
+    let mut tokens: Vec<RequestToken> = Vec::new();
+    let mut is_first_line = true;
+
+    for line in lines {
+        if is_first_line {
+            let (method, uri, version) = parse_first_line(line);
+            tokens.push(method);
+            tokens.push(uri);
+            tokens.push(version);
+            is_first_line = false;
+        } else {
+            let (name, value) = parse_non_first_line(line);
+            tokens.push(name);
+            tokens.push(value);
+        }
+    };
+
+    tokens.push(RequestToken::EndOfText);
+    tokens
+}
+
+fn split_lines(input: &str) -> Vec<&str> {
+    input.trim().split("\r\n").collect::<Vec<&str>>()
+}
+
+fn parse_first_line(line: &str) -> (RequestToken, RequestToken, RequestToken) {
+    let parts: Vec<&str> = line.split(" ").collect::<Vec<&str>>();
+    let method = parts[0].trim();
+    let url = parts[1].trim();
+    let full_version = parts[2].trim();
+    let version = &full_version[5..];
+
+    (RequestToken::Method(method.to_string()),
+        RequestToken::Url(url.to_string()),
+        RequestToken::Version(version.to_string()))
+}
+
+fn parse_non_first_line(line: &str) -> (RequestToken, RequestToken) {
+    let colon_position = line.find(":")
+        .expect("No colon found in line!");
+    let header_name = line[0..colon_position].trim();
+    let header_value = line[colon_position + 1..].trim();
+
+    (RequestToken::HeaderName(header_name.to_string()),
+        RequestToken::HeaderValue(header_value.to_string()))
 }
 
 #[cfg(test)]
@@ -466,7 +484,7 @@ mod tests {
 
     #[test]
     fn test_parse_request_firefox() {
-        let request_fixture = "GET /hello.html HTTP/1.1\r\nHost: localhost:8080\r\nUser-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:58.0) Gecko/20100101 Firefox/58.0\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\nAccept-Language: en,en-US;q=0.7,de;q=0.3\r\nAccept-Encoding: gzip, deflate\r\nReferer: http://localhost:8080/index.html\r\nCookie: _ga=GA1.1.822344465.1506073564; JSESSIONID=node0ag061949mqugevd0gpoadofu2.node0; teamscale-session-8080=admin:A9H8KhGk7eCIm4TR_TJqLKPiJ8Vgm9yQ; io=ngTvRgwb_vVkB9ckAAAP; NXSESSIONID=7f81c463-4a5e-4bc4-9040-8b9779ce9f41; token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdGF0dXMiOiJzdWNjZXNzIiwiZGF0YSI6eyJpZCI6MSwiZW1haWwiOiJhZG1pbkBqdWljZS1zaC5vcCIsInBhc3N3b3JkIjoiMDE5MjAyM2E3YmJkNzMyNTA1MTZmMDY5ZGYxOGI1MDAiLCJjcmVhdGVkQXQiOiIyMDE3LTEwLTIyIDEzOjAxOjIyLjAwMCArMDA6MDAiLCJ1cGRhdGVkQXQiOiIyMDE3LTEwLTIyIDEzOjAxOjIyLjAwMCArMDA6MDAifSwiaWF0IjoxNTA4Njc3OTM4LCJleHAiOjE1MDg2OTU5Mzh9.YJkvadkpWXgx6IpjdrXRv8MurV8Tlms1npl2yqa8pm8\r\nConnection: keep-alive\r\nUpgrade-Insecure-Requests: 1\r\nCache-Control: max-age=0\r\n\r\n";
+        let request_fixture = "GET /hello.html HTTP/1.1\r\nHost: localhost:8080\r\nUser-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:58.0) Gecko/20100101 Firefox/58.0\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\nAccept-Language: en,en-US;q=0.7,de;q=0.3\r\nAccept-Encoding: gzip, deflate\r\nReferer: http://localhost:8080/index.html\r\nCookie: JSESSIONID=node0ag061949mqugevd0gpoadofu2.node0;\r\nConnection: keep-alive\r\nUpgrade-Insecure-Requests: 1\r\nCache-Control: max-age=0\r\n\r\n";
 
         assert_that!(
             parse_request(request_fixture),
@@ -481,7 +499,7 @@ mod tests {
                     upgrade_insecure_requests: String::from("1"),
                     accept_language: String::from("en,en-US;q=0.7,de;q=0.3"),
                     accept_encoding: String::from("gzip, deflate"),
-                    cookie: String::from("_ga=GA1.1.822344465.1506073564; JSESSIONID=node0ag061949mqugevd0gpoadofu2.node0; teamscale-session-8080=admin:A9H8KhGk7eCIm4TR_TJqLKPiJ8Vgm9yQ; io=ngTvRgwb_vVkB9ckAAAP; NXSESSIONID=7f81c463-4a5e-4bc4-9040-8b9779ce9f41; token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdGF0dXMiOiJzdWNjZXNzIiwiZGF0YSI6eyJpZCI6MSwiZW1haWwiOiJhZG1pbkBqdWljZS1zaC5vcCIsInBhc3N3b3JkIjoiMDE5MjAyM2E3YmJkNzMyNTA1MTZmMDY5ZGYxOGI1MDAiLCJjcmVhdGVkQXQiOiIyMDE3LTEwLTIyIDEzOjAxOjIyLjAwMCArMDA6MDAiLCJ1cGRhdGVkQXQiOiIyMDE3LTEwLTIyIDEzOjAxOjIyLjAwMCArMDA6MDAifSwiaWF0IjoxNTA4Njc3OTM4LCJleHAiOjE1MDg2OTU5Mzh9.YJkvadkpWXgx6IpjdrXRv8MurV8Tlms1npl2yqa8pm8"),
+                    cookie: String::from("JSESSIONID=node0ag061949mqugevd0gpoadofu2.node0;"),
                     connection: String::from("keep-alive"),
                     referer: String::from("http://localhost:8080/index.html"),
                     cache_control: String::from("max-age=0"),

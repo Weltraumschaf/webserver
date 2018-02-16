@@ -2,6 +2,9 @@ use std::io::prelude::*;
 use std::fs::File;
 use std::path::PathBuf;
 
+///! This module provides various helpers to deal with files.
+
+/// Reads the bytes from a givne file into a byte vector.
 pub fn read_bytes(file_name: &PathBuf) -> Vec<u8> {
     debug!("Reading file {:?}.", file_name);
     let file = File::open(file_name)
@@ -15,6 +18,7 @@ pub fn read_bytes(file_name: &PathBuf) -> Vec<u8> {
     buffer
 }
 
+/// Reads the bytes from a givne file into a string.
 pub fn read_string(file_name: &PathBuf) -> String {
     debug!("Reading file {:?}.", file_name);
     let mut file = File::open(file_name)

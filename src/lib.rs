@@ -11,26 +11,79 @@ extern crate toml;
 
 use std::path::PathBuf;
 
+///! This is the main webserver module.
+///!
+///! It provides the whole webserver application logic.
+///!
+///! # Examples
+///!
+///! To spin up a webserver run:
+///!
+///! ```
+///! use webserver::Config;
+///! use webserver::server::Server;
+///!
+///! let config = Config::new(
+///!     String::from("127.0.0.1"),
+///!     8080,
+///!     4,
+///!     String::from("web_root"),
+///!     String::from("debug"),
+///!     String::from("logs/")
+///! ).unwrap_or_else(|err| {
+///!     panic!("{}", err);
+///! });
+///!
+///! let server = Server::new(config);
+///!     server.bind().unwrap_or_else(|err| {
+///!         println!("{}", err);
+///! });
+///! ```
+
 mod file;
 mod http;
 mod threads;
 pub mod server;
 
+/// Name of the application
 pub static APPLICATION_NAME: &'static str = "webserver";
+/// Description of the application.
 pub static APPLICATION_DESCRIPTION: &'static str = "Weltraumschaf's Webserver";
+/// Version of the application.
 pub static APPLICATION_VERSION: &'static str = "1.0.0";
 
+/// Configuration of the server.
 #[derive(Debug, Clone, Deserialize, PartialEq)]
 pub struct Config {
+    /// IP address to listen.
     address: String,
+    /// TCP port to listen.
+    /// Must not be zero or less.
     port: u16,
+    /// Number of worker threads
+    /// Must not be zero or less.
     threads: usize,
+    /// Directory with the content to serve.
     dir: String,
+    /// Defines which messages to log.
     log_level: String,
+    /// Location to store log files.
     log_dir: String,
 }
 
 impl Config {
+    /// Reads configuration from a [TOML](https://en.wikipedia.org/wiki/TOML) file.
+    ///
+    /// # Examples
+    ///
+    /// ```toml
+    /// address = '127.0.0.1'
+    /// port = 8080
+    /// threads = 4
+    /// dir = 'target/doc'
+    /// log_level = 'debug'
+    /// log_dir = 'logs/'
+    /// ```
     pub fn from_file(file_name: &PathBuf) -> Result<Config, &'static str> {
         let config = file::read_string(&file_name);
 
@@ -51,6 +104,7 @@ impl Config {
         }
     }
 
+    /// Creates a new configuration object.
     pub fn new(address: String, port: u16, threads: usize, dir: String, log_level: String, log_dir: String) -> Result<Config, &'static str> {
         if address.is_empty() {
             return Err("Config value 'address' must not be empty!");
@@ -81,26 +135,32 @@ impl Config {
         Ok(Config { address, port, threads, dir, log_level, log_dir })
     }
 
+    /// Get the IP address to listen.
     pub fn address(&self) -> &String {
         &self.address
     }
 
+    /// Get the TCP port to listen.
     pub fn port(&self) -> &u16 {
         &self.port
     }
 
+    /// Get the number of worker threads.
     pub fn threads(&self) -> &usize {
         &self.threads
     }
 
+    /// Get the web root directory.
     pub fn dir(&self) -> &String {
         &self.dir
     }
 
+    /// Get the log level.
     pub fn log_level(&self) -> &String {
         &self.log_level
     }
 
+    /// Get the location of the log files.
     pub fn log_dir(&self) -> &String {
         &self.log_dir
     }
