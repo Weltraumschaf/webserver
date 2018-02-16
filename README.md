@@ -37,8 +37,8 @@ And then invoke the binary with a path to a web root directory in the project ro
         - threads  (done)
         - web root  (done)
         - error doc root
-        - log file path (wip)
-- logging to file
+        - log file path (done)
+- logging to file (done)
 - HTTP methods (done)
     - GET requests (done)
         - serve `index.html`/`index.htm` if directory requested (done)

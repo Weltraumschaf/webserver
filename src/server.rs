@@ -210,7 +210,7 @@ fn determine_content_type(file_name: &PathBuf) -> String {
 
 fn add_default_headers(response: &mut Response) {
     response.add_header(ResponseHeader::Date(formatted_now()));
-    response.add_header(ResponseHeader::Server(String::from("Weltraumschaf's Webserver")));
+    response.add_header(ResponseHeader::Server(String::from(super::APPLICATION_DESCRIPTION)));
     response.add_header(ResponseHeader::AcceptRanges(String::from("none")));
 }
 

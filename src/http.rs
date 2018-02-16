@@ -535,12 +535,6 @@ mod tests {
         assert_that!(
             format!("{}", Status::MethodNotAllowed).as_str(),
             is(equal_to("405 METHOD NOT ALLOWED")));
-        assert_that!(
-            format!("{}", Status::InternalServerError).as_str(),
-            is(equal_to("500 INTERNAL SERVER ERROR")));
-        assert_that!(
-            format!("{}", Status::NotImplemented).as_str(),
-            is(equal_to("501 NOT IMPLEMENTED")));
     }
 
     #[test]
