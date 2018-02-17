@@ -1,3 +1,30 @@
+///! This module provides the main server struct.
+///!
+///! # Examples
+///!
+///! To spin up a webserver run:
+///!
+///! ```
+///! use webserver::Config;
+///! use webserver::server::Server;
+///!
+///! let config = Config::new(
+///!     String::from("127.0.0.1"),
+///!     8080,
+///!     4,
+///!     String::from("web_root"),
+///!     String::from("debug"),
+///!     String::from("logs/")
+///! ).unwrap_or_else(|err| {
+///!     panic!("{}", err);
+///! });
+///!
+///! let server = Server::new(config);
+///!     server.bind().unwrap_or_else(|err| {
+///!         println!("{}", err);
+///! });
+///! ```
+
 use std::io::prelude::*;
 use std::path::{Path, PathBuf};
 use std::net::TcpListener;
@@ -9,15 +36,19 @@ use threads::ThreadPool;
 use http;
 use http::{Request, Response, ResponseHeader, Status};
 
+/// Represents the HTTP server.
 pub struct Server {
+    /// Configuration of the server,
     config: Config,
 }
 
 impl Server {
+    /// Creates a new server.
     pub fn new(config: Config) -> Server {
         Server { config }
     }
 
+    /// Bind the server to the configured IP and port and start listening. It returns an error describing the problem if it had failed for any reason.
     pub fn bind(&self) -> Result<(), &'static str> {
         let addr = format!("{}:{}", self.config.address, self.config.port);
         info!("Bind to {}", addr);

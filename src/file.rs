@@ -1,8 +1,8 @@
+///! This module provides various helpers to deal with files.
+
 use std::io::prelude::*;
 use std::fs::File;
 use std::path::PathBuf;
-
-///! This module provides various helpers to deal with files.
 
 /// Reads the bytes from a givne file into a byte vector.
 pub fn read_bytes(file_name: &PathBuf) -> Vec<u8> {

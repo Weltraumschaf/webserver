@@ -1,3 +1,5 @@
+///! This module provides a thread pool.
+
 use std::thread;
 use std::sync::mpsc;
 use std::sync::Arc;
@@ -20,8 +22,11 @@ enum Message {
     Terminate,
 }
 
+/// Represents a thread pool.
 pub struct ThreadPool {
+    /// A vector of workers. They are simply a wrapper of the threads working in the background.
     workers: Vec<Worker>,
+    /// The sender to receive work to be done from.
     sender: mpsc::Sender<Message>,
 }
 
@@ -50,6 +55,7 @@ impl ThreadPool {
         }
     }
 
+    /// Executes the given closure in the background by one of the thread pools workers.
     pub fn execute<F>(&self, f: F)
         where
             F: FnOnce() + Send + 'static

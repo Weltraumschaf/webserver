@@ -1,7 +1,7 @@
+///! This module provides abstractions to deal with HTTP requests and responses.
+
 use std::fmt;
 
-///! This module provides abstractions to deal with HTTP requests and responses.
-///
 /// Used HTTP version.
 pub static VERSION: &'static str = "1.1";
 /// Allowed HTTP methods.

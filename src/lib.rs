@@ -1,3 +1,9 @@
+///! A small HTTP webserver **not for production use*.
+///!
+///! This project is onlly for learning purposes. **Do not use it in production code**.
+///!
+///! This crate is based on the [Rust book](https://doc.rust-lang.org/stable/book/second-edition/ch20-00-final-project-a-web-server.html) and extended to learn more rust.
+
 #[cfg(test)]
 #[macro_use]
 extern crate hamcrest;
@@ -11,38 +17,9 @@ extern crate toml;
 
 use std::path::PathBuf;
 
-///! This is the main webserver module.
-///!
-///! It provides the whole webserver application logic.
-///!
-///! # Examples
-///!
-///! To spin up a webserver run:
-///!
-///! ```
-///! use webserver::Config;
-///! use webserver::server::Server;
-///!
-///! let config = Config::new(
-///!     String::from("127.0.0.1"),
-///!     8080,
-///!     4,
-///!     String::from("web_root"),
-///!     String::from("debug"),
-///!     String::from("logs/")
-///! ).unwrap_or_else(|err| {
-///!     panic!("{}", err);
-///! });
-///!
-///! let server = Server::new(config);
-///!     server.bind().unwrap_or_else(|err| {
-///!         println!("{}", err);
-///! });
-///! ```
-
-mod file;
-mod http;
-mod threads;
+pub mod file;
+pub mod http;
+pub mod threads;
 pub mod server;
 
 /// Name of the application
