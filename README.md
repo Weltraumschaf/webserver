@@ -16,10 +16,23 @@ To build the webserver just run [Cargo][cargo] in the project root directory:
 cargo build
 ```
 
+Make your config:
+```bash
+cp etc/config.example.toml etc/config.toml
+```
+
+For a first test the defaults of the example config should work.
+
 And then invoke the binary with a path to a web root directory in the project root directory:
 
 ```bash
-./target/debug/webserver -d web_root/
+./target/debug/webserver -c etc/config.toml
+```
+
+or run it by cargo:
+
+```bash
+cargo run -- -c etc/config.toml
 ```
 
 ## Wanted features
