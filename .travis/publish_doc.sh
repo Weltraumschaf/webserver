@@ -55,5 +55,9 @@ then
     git commit -m "Auto doc upload from travis"
     git push -fq origin gh-pages > /dev/null
 
+    popd
+    rm -rfv ./webserver
+
+    popd
     echo "Published documentation :-)"
 fi
