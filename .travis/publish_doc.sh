@@ -61,7 +61,7 @@ then
     git push -fq origin gh-pages > /dev/null
 
     popd
-    rm -rfv ./webserver
+    rm -rfv ./gh-pages
 
     popd
     echo "Published documentation :-)"
