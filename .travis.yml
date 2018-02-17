@@ -1,15 +1,26 @@
 language: rust
+
 rust:
   - stable
   - beta
   - nightly
+
+sudo: false
+
+notifications:
+    email:
+        on_success: never
+        on_failure: always
+
 matrix:
   allow_failures:
     - rust: nightly
-# https://www.reddit.com/r/rust/comments/2p6zxy/heres_how_to_easily_deploy_doc_to_github_pages/
-#after_success: |
-#    cargo doc \
-#    && echo '<meta http-equiv=refresh content=0;url=weltraumschaf/index.html>' > target/doc/index.html && \
-#    sudo pip install ghp-import && \
-#    ghp-import -n target/doc && \
-#    git push -qf https://${TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git gh-pages
+
+script:
+    - cargo build
+    - cargo test
+    - cargo doc --no-deps
+    - rustdoc --test README.md -L target
+
+after_success:
+    - .travis/publish_doc.sh
