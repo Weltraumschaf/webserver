@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["read_bytes","Reads the bytes from a givne file into a byte vector."],["read_string","Reads the bytes from a givne file into a string."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ThreadPool","Represents a thread pool."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["file",""],["http",""],["server",""],["threads",""]],"static":[["APPLICATION_DESCRIPTION","Description of the application."],["APPLICATION_NAME","Name of the application"],["APPLICATION_VERSION","Version of the application."]],"struct":[["Config","Configuration of the server."]]});
