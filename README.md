@@ -45,7 +45,7 @@ And then invoke the binary with a path to a web root directory in the project ro
     - HEAD requests (done)
     - OPTIONS request (done)
     - error responses for unsupported methods (done)
-- custom error pages
+- custom error pages (wip)
 - graceful shutdown on `ctrl + c`
 - basic header in the response (done)
     - server (done)

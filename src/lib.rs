@@ -158,9 +158,9 @@ mod tests {
         assert_eq!(config.port(), &expected_port);
         let expected_threads: usize = 4;
         assert_eq!(config.threads(), &expected_threads);
-        assert_eq!(config.web_dir(), "web_root/");
+        assert_eq!(config.web_dir(), "web_dir");
         assert_eq!(config.log_level(), "debug");
-        assert_eq!(config.log_dir(), "logs/");
+        assert_eq!(config.log_dir(), "logs");
     }
 
     #[test]
@@ -171,7 +171,7 @@ mod tests {
             4,
             String::from("dir"),
             String::from("debug"),
-            String::from("logs/"));
+            String::from("logs"));
 
         assert_that!(config, is(equal_to(Err("Config value 'address' must not be empty!"))));
     }
@@ -184,7 +184,7 @@ mod tests {
             4,
             String::from("dir"),
             String::from("debug"),
-            String::from("logs/"));
+            String::from("logs"));
 
         assert_that!(config, is(equal_to(Err("Config value 'port' must be grater than 0!"))));
     }
@@ -197,7 +197,7 @@ mod tests {
             0,
             String::from("dir"),
             String::from("debug"),
-            String::from("logs/"));
+            String::from("logs"));
 
         assert_that!(config, is(equal_to(Err("Config value 'threads' must be grater than 0!"))));
     }
@@ -210,7 +210,7 @@ mod tests {
             4,
             String::from(""),
             String::from("debug"),
-            String::from("logs/"));
+            String::from("logs"));
 
         assert_that!(config, is(equal_to(Err("Config value 'web_dir' must not be empty!"))));
     }
@@ -221,9 +221,9 @@ mod tests {
             String::from("127.0.0.1"),
             8080,
             4,
-            String::from("web_root/"),
+            String::from("web_dir"),
             String::from(""),
-            String::from("logs/"));
+            String::from("logs"));
 
         assert_that!(config, is(equal_to(Err("Config value 'log_level' must not be empty!"))));
     }
@@ -234,7 +234,7 @@ mod tests {
             String::from("127.0.0.1"),
             8080,
             4,
-            String::from("web_root/"),
+            String::from("web_dir"),
             String::from("debug"),
             String::from(""));
 
