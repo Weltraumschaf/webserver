@@ -183,7 +183,7 @@ fn handle_unsupported_request() -> Response {
 }
 
 fn find_resource(config: Config, request: Request) -> Option<PathBuf> {
-    let wanted_resource = create_resource_path(config.dir(), request.url());
+    let wanted_resource = create_resource_path(config.web_dir(), request.url());
     debug!("Wanted resource is {:?}", wanted_resource);
 
     if wanted_resource.is_dir() {

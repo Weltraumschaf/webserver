@@ -41,7 +41,7 @@ pub struct Config {
     /// Must not be zero or less.
     threads: usize,
     /// Directory with the content to serve.
-    dir: String,
+    web_dir: String,
     /// Defines which messages to log.
     log_level: String,
     /// Location to store log files.
@@ -70,7 +70,7 @@ impl Config {
                 config.address,
                 config.port,
                 config.threads,
-                config.dir,
+                config.web_dir,
                 config.log_level,
                 config.log_dir
             ),
@@ -82,7 +82,7 @@ impl Config {
     }
 
     /// Creates a new configuration object.
-    pub fn new(address: String, port: u16, threads: usize, dir: String, log_level: String, log_dir: String) -> Result<Config, &'static str> {
+    pub fn new(address: String, port: u16, threads: usize, web_dir: String, log_level: String, log_dir: String) -> Result<Config, &'static str> {
         if address.is_empty() {
             return Err("Config value 'address' must not be empty!");
         }
@@ -95,8 +95,8 @@ impl Config {
             return Err("Config value 'threads' must be grater than 0!");
         }
 
-        if dir.is_empty() {
-            return Err("Config value 'dir' must not be empty!");
+        if web_dir.is_empty() {
+            return Err("Config value 'web_dir' must not be empty!");
         }
 
         // TODO Validate that it is a proper level.
@@ -109,7 +109,7 @@ impl Config {
             return Err("Config value 'log_dir' must not be empty!");
         }
 
-        Ok(Config { address, port, threads, dir, log_level, log_dir })
+        Ok(Config { address, port, threads, web_dir: web_dir, log_level, log_dir })
     }
 
     /// Get the IP address to listen.
@@ -128,8 +128,8 @@ impl Config {
     }
 
     /// Get the web root directory.
-    pub fn dir(&self) -> &String {
-        &self.dir
+    pub fn web_dir(&self) -> &String {
+        &self.web_dir
     }
 
     /// Get the log level.
@@ -158,7 +158,7 @@ mod tests {
         assert_eq!(config.port(), &expected_port);
         let expected_threads: usize = 4;
         assert_eq!(config.threads(), &expected_threads);
-        assert_eq!(config.dir(), "web_root/");
+        assert_eq!(config.web_dir(), "web_root/");
         assert_eq!(config.log_level(), "debug");
         assert_eq!(config.log_dir(), "logs/");
     }
@@ -212,7 +212,7 @@ mod tests {
             String::from("debug"),
             String::from("logs/"));
 
-        assert_that!(config, is(equal_to(Err("Config value 'dir' must not be empty!"))));
+        assert_that!(config, is(equal_to(Err("Config value 'web_dir' must not be empty!"))));
     }
 
     #[test]

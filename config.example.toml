@@ -1,6 +1,7 @@
 address = '127.0.0.1'
 port = 8080
 threads = 4
-dir = 'target/doc/'
+web_dir = 'target/doc/'
+#error_dir = 'error_root/'
 log_level = 'debug'
 log_dir = 'logs/'
