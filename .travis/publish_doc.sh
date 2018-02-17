@@ -34,7 +34,7 @@ set -u
 if  [ "${TRAVIS_BRANCH}" = "master" ] &&
     [ "${TRAVIS_PULL_REQUEST}" = "false" ] &&
     [ "{$TRAVIS_REPO_SLUG}" = "weltraumschaf/webserver" ] &&
-    [ "{$TRAVIS_RUST_VERSION}" = "1.0.0-beta" ]
+    [ "{$TRAVIS_RUST_VERSION}" = "stable" ]
 then
     echo "Publishing documentation ..."
 
