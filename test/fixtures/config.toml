@@ -1,0 +1,6 @@
+address = '127.0.0.1'
+port = 8080
+threads = 4
+web_dir = 'web_dir'
+log_level = 'debug'
+log_dir = 'logs'

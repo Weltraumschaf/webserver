@@ -37,7 +37,7 @@ mod tests {
 
     #[test]
     fn test_read_bytes() {
-        let content = read_bytes(&PathBuf::from("test/hello.txt"));
+        let content = read_bytes(&PathBuf::from("test/fixtures/hello.txt"));
 
         assert_that!(
             content,
@@ -47,7 +47,7 @@ mod tests {
 
     #[test]
     fn test_read_string() {
-        let content = read_string(&PathBuf::from("test/hello.txt"));
+        let content = read_string(&PathBuf::from("test/fixtures/hello.txt"));
 
         assert_that!(
             content,

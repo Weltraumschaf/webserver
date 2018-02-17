@@ -150,7 +150,7 @@ mod tests {
 
     #[test]
     fn read_config_from_from_file() {
-        let config = Config::from_file(&PathBuf::from("test/config.toml"))
+        let config = Config::from_file(&PathBuf::from("test/fixtures/config.toml"))
             .expect("Can't read config fixture file!");
 
         assert_eq!(config.address(), "127.0.0.1");
