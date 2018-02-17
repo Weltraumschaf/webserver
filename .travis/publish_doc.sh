@@ -38,6 +38,11 @@ if  [ "${TRAVIS_BRANCH}" = "master" ] &&
 then
     echo "Publishing documentation ..."
 
+    echo "TRAVIS_BRANCH: ${TRAVIS_BRANCH}"
+    echo "TRAVIS_PULL_REQUEST: ${TRAVIS_PULL_REQUEST}"
+    echo "TRAVIS_REPO_SLUG: {$TRAVIS_REPO_SLUG}"
+    echo "TRAVIS_RUST_VERSION: {$TRAVIS_RUST_VERSION}"
+
     pushd "${HOME}"
     git clone --quiet --branch=gh-pages https://${TOKEN}@github.com/weltraumschaf/webserver gh-pages > /dev/null
 
