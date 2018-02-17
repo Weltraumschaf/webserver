@@ -51,7 +51,7 @@ then
     git config user.name "travis-ci"
 
     git rm -rf . > /dev/null
-    cp -Rf {$TRAVIS_BUILD_DIR}/target/doc/* .
+    cp -Rf ${TRAVIS_BUILD_DIR}/target/doc/* .
 
     git reset HEAD -- index.html > /dev/null
     git checkout -- index.html > /dev/null
