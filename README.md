@@ -8,6 +8,8 @@ Based on the multithreaded example in the [Rust Book][rust-book].
 
 The goal of this project is to extend the basic implementation from the book with some useful features to learn [Rust][rust-lang].
 
+The crate doc is [here][crate-doc].
+
 ## Build and Run
 
 To build the webserver just run [Cargo][cargo] in the project root directory:
@@ -70,3 +72,4 @@ cargo run -- -c etc/config.toml
 [rust-book]:    https://doc.rust-lang.org/stable/book/second-edition/ch20-00-final-project-a-web-server.html
 [rust-lang]:    https://www.rust-lang.org/
 [cargo]:        https://doc.rust-lang.org/cargo/
+[crate-doc]:    https://weltraumschaf.github.io/webserver/webserver/index.html
