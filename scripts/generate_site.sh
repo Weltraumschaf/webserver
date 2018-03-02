@@ -14,17 +14,16 @@ rustdoc --test README.md -L target
 tmp_dir=$(mktemp -d)
 
 pushd "${tmp_dir}"
-git clone --quiet --branch=gh-pages git@github.com:Weltraumschaf/webserver.git gh-pages
+git clone --quiet --branch=gh-pages git@github.com:Weltraumschaf/webserver.git webserver
 
-pushd gh-pages
+pushd webserver
 git config user.email "travis@travis-ci.org"
 git config user.name "travis-ci"
 
-git rm -rf . > /dev/null
+git checkout gh-pages
+git rm -rf .
 cp -Rf ${PROJECT_HOME}/target/doc/* .
-
-git reset HEAD -- index.html > /dev/null
-git checkout -- index.html > /dev/null
+git checkout master -- README.md
 
 git add -f .
 git commit -m "Auto doc upload from travis"
