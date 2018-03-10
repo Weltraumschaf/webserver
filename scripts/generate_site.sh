@@ -14,7 +14,7 @@ rustdoc --test README.md -L target
 tmp_dir=$(mktemp -d)
 
 pushd "${tmp_dir}"
-git clone --quiet --branch=gh-pages git@github.com:Weltraumschaf/webserver.git webserver
+git clone --quiet git@github.com:Weltraumschaf/webserver.git webserver
 
 pushd webserver
 git config user.email "travis@travis-ci.org"
