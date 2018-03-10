@@ -1,6 +1,6 @@
 # Minimalistic HTTP Server
 
-[![Build Status](https://travis-ci.org/Weltraumschaf/webserver.svg?branch=master)](https://travis-ci.org/Weltraumschaf/webserver)
+[![Build Status][travis-badge]][travis-project] [![codecov][codecov-badge]][codecov-project]
 
 Based on the multithreaded example in the [Rust Book][rust-book].
 
@@ -68,8 +68,12 @@ cargo run -- -c etc/config.toml
     - content-type w/ right type (done)
     - date (done)
     - content-length (done)
-    
-[rust-book]:    https://doc.rust-lang.org/stable/book/second-edition/ch20-00-final-project-a-web-server.html
-[rust-lang]:    https://www.rust-lang.org/
-[cargo]:        https://doc.rust-lang.org/cargo/
-[crate-doc]:    https://weltraumschaf.github.io/webserver/webserver/index.html
+
+[travis-project]:   https://travis-ci.org/Weltraumschaf/webserver
+[travis-badge]:     https://travis-ci.org/Weltraumschaf/webserver.svg?branch=master
+[codecov-project]:  https://codecov.io/gh/Weltraumschaf/webserver
+[codecov-badge]:    https://codecov.io/gh/Weltraumschaf/webserver/branch/master/graph/badge.svg
+[rust-book]:        https://doc.rust-lang.org/stable/book/second-edition/ch20-00-final-project-a-web-server.html
+[rust-lang]:        https://www.rust-lang.org/
+[cargo]:            https://doc.rust-lang.org/cargo/
+[crate-doc]:        https://weltraumschaf.github.io/webserver/webserver/index.html
