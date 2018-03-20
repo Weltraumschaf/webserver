@@ -4,7 +4,7 @@
 ///!
 ///! To spin up a webserver run:
 ///!
-///! ```
+///! ```no_runrm
 ///! use webserver::Config;
 ///! use webserver::server::Server;
 ///!
